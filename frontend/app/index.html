@@ -1,0 +1,2646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Unified Infracare Data Store & Sync -->
+  <script src="/store.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>INFRAcare — Civic Pulse | Municipal Infrastructure Command</title>
+
+  <!-- Leaflet Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. HIGH-CONTRAST CLEAN LIGHT CIVIC-TECH DESIGN SYSTEM
+       ========================================================================== */
+    :root {
+      --bg-page: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-dark: #0a0e17;
+      --bg-dark-card: #121824;
+      
+      --border-dark: #0f172a;
+      --border-light: #e2e8f0;
+      
+      --orange-main: #ff4800;
+      --orange-hover: #e03e00;
+      --orange-light: #fff5f0;
+      
+      --yellow-main: #ffd000;
+      --yellow-hover: #ecc000;
+      --yellow-light: #fefce8;
+      
+      --green-main: #10b981;
+      --green-light: #ecfdf5;
+      
+      --red-main: #ef4444;
+      --red-light: #fef2f2;
+
+      --blue-main: #2563eb;
+      --blue-light: #eff6ff;
+
+      --cyan-main: #06b6d4;
+
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #64748b;
+      --text-white: #ffffff;
+
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --shadow-brutal-sm: 2px 2px 0px #0f172a;
+      --shadow-brutal: 4px 4px 0px #0f172a;
+      --shadow-brutal-lg: 6px 6px 0px #0f172a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-page);
+      background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ==========================================================================
+       2. TOP NAVBAR (HIGH CONTRAST DARK MUNICIPAL COMMAND BAR)
+       ========================================================================== */
+    #navbar {
+      position: sticky;
+      top: 0;
+      background: #0a0e17;
+      border-bottom: 2px solid #000000;
+      z-index: 1000;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .nav-wrapper {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .brand-badge {
+      background: var(--orange-main);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 13px;
+      padding: 4px 8px;
+      border: 1.5px solid #ffffff;
+      box-shadow: 2px 2px 0px #000;
+      letter-spacing: 0.5px;
+    }
+    .brand-title {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+    }
+    .brand-title span { color: var(--orange-main); }
+    .brand-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #94a3b8;
+      border-left: 1.5px solid #334155;
+      padding-left: 10px;
+      margin-left: 4px;
+      display: none;
+    }
+    @media(min-width: 860px) { .brand-tag { display: inline-block; } }
+
+    .nav-links {
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    @media(min-width: 780px) { .nav-links { display: flex; } }
+
+    .nav-link {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 2px;
+      border: 1px solid transparent;
+    }
+    .nav-link:hover {
+      color: #ffffff;
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .live-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #182234;
+      color: var(--green-main);
+      border: 1.5px solid #334155;
+      padding: 4px 9px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      box-shadow: 2px 2px 0px #000;
+    }
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--green-main);
+      border-radius: 50%;
+      animation: blink 1.2s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.8); }
+    }
+
+    .role-select-box {
+      background: #182234;
+      border: 1.8px solid #334155;
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 5px 8px;
+      cursor: pointer;
+      outline: none;
+      box-shadow: 2px 2px 0px #000;
+    }
+    .role-select-box option {
+      background: #0a0e17;
+      color: #ffffff;
+    }
+
+    .btn-header-report {
+      background: var(--orange-main);
+      color: #fff;
+      border: 2px solid #ffffff;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 800;
+      padding: 7px 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 2px 2px 0px #000;
+      transition: all 0.15s ease;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+    .btn-header-report:hover {
+      background: var(--orange-hover);
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px #000;
+    }
+
+    /* ==========================================================================
+       3. HERO / COMMAND BANNER
+       ========================================================================== */
+    #hero-section {
+      padding: 28px 0 20px 0;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    @media(min-width: 900px) {
+      .hero-grid {
+        grid-template-columns: 1.4fr 1fr;
+        align-items: stretch;
+      }
+    }
+
+    .hero-main-card {
+      background: #ffffff;
+      border: 2px solid var(--border-dark);
+      padding: 26px;
+      box-shadow: var(--shadow-brutal);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .hero-tag {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--orange-main);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hero-headline {
+      font-family: var(--font-sans);
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      line-height: 1.05;
+      color: #000;
+    }
+    .hero-subtitle {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .hero-actions-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn-hero-orange {
+      background: var(--orange-main);
+      color: #fff;
+      border: 2px solid var(--border-dark);
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      font-weight: 800;
+      padding: 12px 22px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-brutal);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.15s ease;
+    }
+    .btn-hero-orange:hover {
+      background: var(--orange-hover);
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-brutal-lg);
+    }
+    .btn-hero-white {
+      background: #ffffff;
+      color: #000;
+      border: 2px solid var(--border-dark);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 800;
+      padding: 12px 18px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-brutal);
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .btn-hero-white:hover {
+      background: #f4f4f5;
+      transform: translate(-1px, -1px);
+    }
+
+    /* Municipal Network Banner (Solid Black Card matching reference) */
+    .network-banner-card {
+      background: #0a0e17;
+      color: #ffffff;
+      border: 2px solid var(--border-dark);
+      padding: 26px;
+      box-shadow: var(--shadow-brutal);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      position: relative;
+    }
+    .network-banner-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .network-tag-label {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #a1a1aa;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+    .network-sync-clock {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--yellow-main);
+      letter-spacing: 0.5px;
+    }
+    .network-status-text {
+      font-family: var(--font-sans);
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+    }
+    .network-desc-text {
+      font-size: 12px;
+      color: #a1a1aa;
+      line-height: 1.45;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      padding-top: 12px;
+    }
+
+    /* ==========================================================================
+       4. LIVE KPI METRICS (4 COLUMNS)
+       ========================================================================== */
+    #kpi-section {
+      padding: 0 0 24px 0;
+    }
+    .kpi-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    @media(min-width: 768px) {
+      .kpi-cards-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .kpi-stat-card {
+      background: #ffffff;
+      border: 2px solid var(--border-dark);
+      padding: 16px 14px;
+      box-shadow: var(--shadow-brutal-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .kpi-stat-card:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-brutal);
+    }
+    .kpi-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .kpi-icon-badge {
+      font-size: 17px;
+    }
+    .kpi-icon-badge.orange { color: var(--orange-main); }
+    .kpi-icon-badge.red { color: var(--red-main); }
+    .kpi-icon-badge.blue { color: var(--blue-main); }
+    .kpi-icon-badge.green { color: var(--green-main); }
+
+    .kpi-stat-number {
+      font-family: var(--font-sans);
+      font-size: 32px;
+      font-weight: 900;
+      color: #000;
+      line-height: 1;
+      margin-top: 4px;
+    }
+    .kpi-stat-label {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      font-weight: 800;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ==========================================================================
+       5. MAIN 2-COLUMN WORKSPACE (INCIDENTS FEED + GIS MAP)
+       ========================================================================== */
+    #workspace-section {
+      padding: 0 0 40px 0;
+    }
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    @media(min-width: 960px) {
+      .workspace-grid {
+        grid-template-columns: 1.15fr 0.85fr;
+        align-items: start;
+      }
+    }
+
+    /* Left: Incidents Hub */
+    .incidents-hub-column {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .hub-filter-card {
+      background: #ffffff;
+      border: 2px solid var(--border-dark);
+      padding: 16px;
+      box-shadow: var(--shadow-brutal-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .hub-title-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .hub-heading {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hub-search-input {
+      background: #f8fafc;
+      border: 1.8px solid var(--border-dark);
+      padding: 7px 12px;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      outline: none;
+      width: 100%;
+      max-width: 220px;
+    }
+    .hub-search-input:focus {
+      background: #fff;
+      border-color: var(--orange-main);
+    }
+
+    /* Filter Chips (Neo-brutalist pills) */
+    .filter-chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .filter-chip-btn {
+      background: #ffffff;
+      border: 1.8px solid var(--border-dark);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #000;
+      padding: 6px 12px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px #000;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .filter-chip-btn:hover { background: #f4f4f5; }
+    .filter-chip-btn.active {
+      background: var(--yellow-main);
+      color: #000;
+    }
+
+    /* Incidents List */
+    .incidents-stream-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .incident-item-card {
+      background: #ffffff;
+      border: 2px solid var(--border-dark);
+      padding: 16px;
+      box-shadow: var(--shadow-brutal-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+    .incident-item-card:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-brutal);
+    }
+
+    .item-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .item-id-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      background: #000;
+      color: #fff;
+      padding: 3px 7px;
+    }
+    .item-badge-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .prio-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border: 1.2px solid #000;
+      text-transform: uppercase;
+    }
+    .prio-badge.P1 { background: var(--red-main); color: #fff; }
+    .prio-badge.P2 { background: #f97316; color: #fff; }
+    .prio-badge.P3 { background: #06b6d4; color: #000; }
+    .prio-badge.P4 { background: #10b981; color: #fff; }
+
+    .status-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border: 1.2px solid #000;
+      text-transform: uppercase;
+    }
+    .status-badge.reported { background: #e4e4e7; color: #000; }
+    .status-badge.verified { background: #fef08a; color: #000; }
+    .status-badge.assigned { background: #bae6fd; color: #000; }
+    .status-badge.in_progress { background: #fed7aa; color: #000; }
+    .status-badge.resolved { background: #bbf7d0; color: #000; }
+
+    .incident-item-title {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      font-weight: 800;
+      color: #000;
+      line-height: 1.3;
+    }
+    .incident-item-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+    .incident-item-photo {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border: 1.8px solid var(--border-dark);
+    }
+
+    .item-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1.5px dashed var(--border-light);
+      padding-top: 10px;
+      margin-top: 2px;
+    }
+    .item-coords-stamp {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .item-action-btns {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-support-vote {
+      background: #f4f4f5;
+      border: 1.5px solid var(--border-dark);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 5px 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 1.5px 1.5px 0px #000;
+      transition: all 0.1s ease;
+    }
+    .btn-support-vote:hover {
+      background: var(--yellow-main);
+    }
+    .btn-locate-map {
+      background: #000;
+      color: #fff;
+      border: 1.5px solid #000;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 5px 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 1.5px 1.5px 0px #000;
+    }
+    .btn-locate-map:hover {
+      background: var(--orange-main);
+    }
+
+    /* Right: Integrated Map Card */
+    .gis-map-card {
+      background: #ffffff;
+      border: 2px solid var(--border-dark);
+      box-shadow: var(--shadow-brutal);
+      position: sticky;
+      top: 80px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .gis-map-header {
+      background: #0a0e17;
+      color: #fff;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--border-dark);
+    }
+    .gis-map-title {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--orange-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.5px;
+    }
+    .gis-map-tools {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-tool-pill {
+      background: #18181b;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      padding: 4px 9px;
+      cursor: pointer;
+      border-radius: 2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-tool-pill.active {
+      background: var(--yellow-main);
+      color: #000;
+      font-weight: 800;
+      border-color: #000;
+    }
+
+    #web-map-viewport {
+      width: 100%;
+      height: 480px;
+      background: #090d16;
+    }
+
+    .gis-map-footer {
+      padding: 10px 14px;
+      background: #f4f4f5;
+      border-top: 1.5px solid var(--border-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--text-dim);
+    }
+
+    /* ==========================================================================
+       6. MUNICIPAL DISPATCH TABLE
+       ========================================================================== */
+    #dispatch-section {
+      padding: 0 0 50px 0;
+    }
+    .dispatch-queue-card {
+      background: #ffffff;
+      border: 2px solid var(--border-dark);
+      padding: 20px;
+      box-shadow: var(--shadow-brutal);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .dispatch-queue-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--border-dark);
+      padding-bottom: 12px;
+    }
+    .dispatch-queue-title {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dispatch-table-wrap {
+      overflow-x: auto;
+    }
+    .queue-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .queue-table th {
+      background: #0a0e17;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      padding: 10px 12px;
+      text-align: left;
+      border: 1.5px solid #000;
+    }
+    .queue-table td {
+      padding: 10px 12px;
+      border: 1.5px solid var(--border-dark);
+      background: #fff;
+    }
+    .queue-table tr:hover td {
+      background: #f8fafc;
+    }
+
+    /* ==========================================================================
+       7. CLEAN LIGHT REPORT DAMAGE MODAL
+       ========================================================================== */
+    #report-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(10, 14, 23, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    #report-modal-backdrop.open { display: flex; }
+
+    #report-dialog-box {
+      background: #ffffff;
+      border: 3px solid var(--border-dark);
+      box-shadow: var(--shadow-brutal-lg);
+      width: 100%;
+      max-width: 540px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalPop {
+      from { transform: scale(0.96); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-dialog-header {
+      background: #0a0e17;
+      color: #fff;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--border-dark);
+    }
+    .modal-dialog-title {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--orange-main);
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-dialog-close {
+      background: #27272a;
+      border: 1.5px solid #52525b;
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 2px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-dialog-close:hover { background: var(--red-main); border-color: #000; }
+
+    .modal-stepper-bar {
+      background: #f4f4f5;
+      border-bottom: 1.5px solid var(--border-dark);
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .stepper-node { color: #71717a; display: flex; align-items: center; gap: 4px; }
+    .stepper-node.active { color: #000; font-weight: 800; }
+    .stepper-node.completed { color: var(--green-main); }
+
+    .modal-dialog-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-group-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-field-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      color: #000;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-text-input, .form-textarea-input {
+      background: #f8fafc;
+      border: 1.8px solid var(--border-dark);
+      padding: 10px 12px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: #000;
+      border-radius: 2px;
+      outline: none;
+    }
+    .form-text-input:focus, .form-textarea-input:focus {
+      background: #fff;
+      border-color: var(--orange-main);
+      box-shadow: 2px 2px 0px var(--orange-main);
+    }
+    .form-textarea-input { resize: vertical; min-height: 75px; }
+
+    .category-buttons-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+    .cat-choice-btn {
+      background: #ffffff;
+      border: 1.8px solid var(--border-dark);
+      padding: 10px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px #000;
+      transition: all 0.15s ease;
+    }
+    .cat-choice-btn i { font-size: 15px; color: #52525b; }
+    .cat-choice-btn span { font-family: var(--font-mono); font-size: 10px; font-weight: 800; }
+    .cat-choice-btn:hover { background: #f4f4f5; }
+    .cat-choice-btn.selected { background: #0a0e17; color: #fff; }
+    .cat-choice-btn.selected i { color: var(--orange-main); }
+
+    .severity-buttons-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    .sev-choice-btn {
+      background: #ffffff;
+      border: 1.8px solid var(--border-dark);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 8px 4px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px #000;
+      text-transform: uppercase;
+      transition: all 0.15s ease;
+    }
+    .sev-choice-btn:hover { background: #f4f4f5; }
+    .sev-choice-btn.selected[data-sev="Critical"] { background: var(--red-main); color: #fff; }
+    .sev-choice-btn.selected[data-sev="High"] { background: #f97316; color: #fff; }
+    .sev-choice-btn.selected[data-sev="Medium"] { background: #06b6d4; color: #000; }
+    .sev-choice-btn.selected[data-sev="Low"] { background: #10b981; color: #fff; }
+
+    /* Photo Upload Dropzone */
+    .photo-dropzone-box {
+      border: 2px dashed var(--border-dark);
+      background: #f8fafc;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+    .photo-dropzone-box:hover { background: #f1f5f9; border-color: var(--orange-main); }
+    .photo-preview-wrap {
+      display: none;
+      border: 2px solid var(--border-dark);
+      box-shadow: var(--shadow-brutal-sm);
+    }
+    .photo-preview-wrap.show { display: block; }
+    .preview-render-img { width: 100%; height: 160px; object-fit: cover; display: block; }
+    .preview-meta-bar {
+      background: #0a0e17;
+      color: #fff;
+      padding: 6px 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-dialog-footer {
+      background: #fff;
+      border-top: 2px solid var(--border-dark);
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .btn-step-back {
+      background: #f4f4f5;
+      border: 2px solid var(--border-dark);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 800;
+      padding: 10px 16px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px #000;
+    }
+    .btn-step-next {
+      flex: 1;
+      background: var(--orange-main);
+      color: #fff;
+      border: 2px solid var(--border-dark);
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 10px 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 3px 3px 0px #000;
+      transition: all 0.15s ease;
+    }
+    .btn-step-next:hover {
+      background: var(--orange-hover);
+      transform: translate(-1px, -1px);
+    }
+
+    .step-section-pane { display: none; }
+    .step-section-pane.active { display: flex; flex-direction: column; gap: 14px; }
+
+    /* Progress Overlay */
+    #submission-progress-overlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 14, 23, 0.94);
+      z-index: 2500;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      color: #fff;
+      gap: 16px;
+    }
+    #submission-progress-overlay.show { display: flex; }
+    .progress-spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid rgba(255,255,255,0.2);
+      border-top-color: var(--orange-main);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* Map Beacons */
+    .pulse-marker-beacon {
+      position: relative;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .beacon-core {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid #000;
+      z-index: 2;
+    }
+    .beacon-wave {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: radarWave 2s infinite ease-out;
+      z-index: 1;
+    }
+    @keyframes radarWave {
+      0% { transform: scale(0.6); opacity: 0.9; }
+      100% { transform: scale(2.4); opacity: 0; }
+    }
+
+    /* Toast */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 9999;
+      pointer-events: none;
+      width: 90%;
+      max-width: 360px;
+    }
+    .toast-card {
+      background: #0a0e17;
+      color: #fff;
+      border: 2px solid var(--border-dark);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 10px 14px;
+      box-shadow: var(--shadow-brutal-sm);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Footer */
+    #footer {
+      background: #0a0e17;
+      color: #a1a1aa;
+      border-top: 2px solid var(--border-dark);
+      padding: 24px 0;
+      margin-top: auto;
+    }
+    .footer-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    @media(min-width: 768px) {
+      .footer-wrapper { flex-direction: row; }
+    }
+  
+    /* ==========================================================================
+       8. COLLAPSIBLE MULTI-PHOTO EVIDENCE & HORIZONTAL SCROLL TRACK
+       ========================================================================== */
+    .evidence-toggle-wrap {
+      margin-top: 4px;
+    }
+    .btn-evidence-toggle {
+      background: #f8fafc;
+      border: 1.5px solid var(--border-dark);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-main);
+      padding: 5px 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 2px;
+      transition: all 0.15s ease;
+    }
+    .btn-evidence-toggle:hover {
+      background: #e2e8f0;
+      border-color: var(--orange-main);
+    }
+    .btn-evidence-toggle.active {
+      background: var(--yellow-main);
+      color: #000000;
+      border-color: #000000;
+    }
+    .btn-evidence-toggle .arrow-icon {
+      font-size: 10px;
+      transition: transform 0.2s ease;
+    }
+    .btn-evidence-toggle.active .arrow-icon {
+      transform: rotate(180deg);
+    }
+
+    .evidence-drawer {
+      display: none;
+      margin-top: 8px;
+      padding: 10px;
+      background: #f1f5f9;
+      border: 1.5px solid var(--border-dark);
+      border-radius: 3px;
+      animation: fadeIn 0.2s ease;
+    }
+    .evidence-drawer.open {
+      display: block;
+    }
+
+    .evidence-photos-track {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .evidence-photos-track::-webkit-scrollbar {
+      height: 6px;
+    }
+    .evidence-photos-track::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 3px;
+    }
+    .evidence-photos-track::-webkit-scrollbar-track {
+      background: #e2e8f0;
+    }
+
+    .evidence-photo-item {
+      flex: 0 0 170px;
+      height: 125px;
+      scroll-snap-align: start;
+      position: relative;
+      border: 1.8px solid var(--border-dark);
+      background: #0a0e17;
+      cursor: pointer;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+    .evidence-photo-item:hover .photo-overlay-zoom {
+      opacity: 1;
+    }
+    .evidence-photo-item:hover .evidence-scroll-img {
+      transform: scale(1.06);
+    }
+
+    .evidence-scroll-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.2s ease;
+      display: block;
+    }
+
+    .photo-overlay-zoom {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(10, 14, 23, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 20px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .evidence-scroll-hint {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--text-dim);
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Lightbox Modal */
+    #photo-lightbox-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(10, 14, 23, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #photo-lightbox-modal.open {
+      display: flex;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- 1. TOP NAVBAR -->
+  <header id="navbar">
+    <div class="container">
+      <div class="nav-wrapper">
+        <a href="#hero-section" class="brand-box">
+          <div class="brand-badge">INFRA</div>
+          <div class="brand-title">INFRA<span>care</span></div>
+          <span class="brand-tag">| Civic Command Platform</span>
+        </a>
+
+        <nav class="nav-links">
+          <a href="#hero-section" class="nav-link"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+          <a href="#workspace-section" class="nav-link"><i class="fa-solid fa-list-ul"></i> Incidents Feed</a>
+          <a href="#web-map-viewport" class="nav-link"><i class="fa-solid fa-map-location-dot"></i> Live GIS Map</a>
+          <a href="#dispatch-section" class="nav-link"><i class="fa-solid fa-shield-halved"></i> Dispatch Queue</a>
+          <a href="/admin" class="nav-link" style="color:var(--yellow-main);"><i class="fa-solid fa-user-shield"></i> Admin Portal</a>
+        </nav>
+
+        <div class="nav-actions">
+          <div class="live-status-pill">
+            <span class="live-dot"></span>
+            <span>LIVE</span>
+          </div>
+
+          <select class="role-select-box" id="global-role-select" onchange="onRoleSwitched(this.value)">
+            <option value="citizen" selected>Citizen Reporter</option>
+            <option value="admin">Municipal Admin</option>
+          </select>
+
+          <button class="btn-header-report" onclick="openReportModal()">
+            <i class="fa-solid fa-plus"></i>
+            <span>Report Damage</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. HERO / COMMAND BANNER -->
+  <section id="hero-section">
+    <div class="container">
+      <div class="hero-grid">
+        <!-- Hero Information -->
+        <div class="hero-main-card">
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div class="hero-tag">
+              <i class="fa-solid fa-satellite-dish"></i>
+              <span>INFRASTRUCTURE COMMAND</span>
+            </div>
+            <h1 class="hero-headline">Civic pulse</h1>
+            <p class="hero-subtitle">Transparent municipal infrastructure maintenance, one report at a time. AI-driven priority triage, duplicate radar detection, and automated field dispatch.</p>
+          </div>
+
+          <div class="hero-actions-row">
+            <button class="btn-hero-orange" onclick="openReportModal()">
+              <i class="fa-solid fa-plus"></i>
+              <span>Report Damage ↗</span>
+            </button>
+            <a href="#web-map-viewport" class="btn-hero-white">
+              <i class="fa-solid fa-map"></i>
+              <span>Inspect GIS Map</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Municipal Network Banner (Solid Black Card matching reference) -->
+        <div class="network-banner-card">
+          <div class="network-banner-top">
+            <span class="network-tag-label">MUNICIPAL NETWORK</span>
+            <span class="network-sync-clock" id="sync-timer-val">SYNC 00:04:12</span>
+          </div>
+          <div class="network-status-text">OPERATIONAL</div>
+          <div class="network-desc-text">
+            Live telemetry connected to Central Municipal GIS Registry. Automatic spatial clustering, priority algorithms, and field route optimization enabled.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. LIVE KPI METRICS (4 COLUMNS) -->
+  <section id="kpi-section">
+    <div class="container">
+      <div class="kpi-cards-grid">
+        <div class="kpi-stat-card" onclick="filterByUrgency('ALL')">
+          <div class="kpi-card-top">
+            <span class="kpi-stat-label">TOTAL CASES</span>
+            <i class="fa-regular fa-clipboard kpi-icon-badge orange"></i>
+          </div>
+          <div class="kpi-stat-number" id="kpi-total-val">0</div>
+        </div>
+
+        <div class="kpi-stat-card" onclick="filterByUrgency('CRITICAL')">
+          <div class="kpi-card-top">
+            <span class="kpi-stat-label">CRITICAL HAZARDS</span>
+            <i class="fa-solid fa-circle-exclamation kpi-icon-badge red"></i>
+          </div>
+          <div class="kpi-stat-number" id="kpi-crit-val">0</div>
+        </div>
+
+        <div class="kpi-stat-card" onclick="filterByUrgency('IN_PROGRESS')">
+          <div class="kpi-card-top">
+            <span class="kpi-stat-label">ACTIVE / ASSIGNED</span>
+            <i class="fa-solid fa-person-digging kpi-icon-badge blue"></i>
+          </div>
+          <div class="kpi-stat-number" id="kpi-prog-val">0</div>
+        </div>
+
+        <div class="kpi-stat-card" onclick="filterByUrgency('RESOLVED')">
+          <div class="kpi-card-top">
+            <span class="kpi-stat-label">RESOLVED CASES</span>
+            <i class="fa-regular fa-circle-check kpi-icon-badge green"></i>
+          </div>
+          <div class="kpi-stat-number" id="kpi-res-val">0</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. MAIN 2-COLUMN WORKSPACE (INCIDENTS FEED + EMBEDDED MAP) -->
+  <section id="workspace-section">
+    <div class="container">
+      <div class="workspace-grid">
+
+        <!-- LEFT: INCIDENTS STREAM -->
+        <div class="incidents-hub-column">
+          <div class="hub-filter-card">
+            <div class="hub-title-row">
+              <div class="hub-heading">
+                <i class="fa-solid fa-tower-broadcast" style="color:var(--orange-main)"></i>
+                <span>Live Municipal Incidents Feed</span>
+              </div>
+              <input type="text" id="incidents-search-box" class="hub-search-input" placeholder="Search by landmark/title..." onkeyup="onSearchQuery(this.value)" />
+            </div>
+
+            <div class="filter-chips-row">
+              <button class="filter-chip-btn active" id="chip-all" onclick="filterByUrgency('ALL')">ALL</button>
+              <button class="filter-chip-btn" id="chip-critical" onclick="filterByUrgency('CRITICAL')">CRITICAL</button>
+              <button class="filter-chip-btn" id="chip-moderate" onclick="filterByUrgency('MODERATE')">MODERATE</button>
+              <button class="filter-chip-btn" id="chip-low" onclick="filterByUrgency('LOW')">LOW</button>
+              <button class="filter-chip-btn" id="chip-resolved" onclick="filterByUrgency('RESOLVED')">RESOLVED</button>
+            </div>
+          </div>
+
+          <!-- Incidents Cards Stream -->
+          <div class="incidents-stream-stack" id="incidents-feed-wrap">
+            <div style="text-align:center; padding:30px; font-family:var(--font-mono); font-size:12px; color:var(--text-dim);">
+              <i class="fa-solid fa-spinner fa-spin"></i> Loading live reports...
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: INTERACTIVE GIS MAP CARD -->
+        <div class="gis-map-card">
+          <div class="gis-map-header">
+            <div class="gis-map-title">
+              <i class="fa-solid fa-map-pin"></i>
+              <span>Spatial Incident Radar</span>
+            </div>
+            <div class="gis-map-tools">
+              <button class="btn-tool-pill active" id="btn-tile-switch" onclick="toggleMapLayer()">
+                <i class="fa-solid fa-satellite"></i> Satellite
+              </button>
+              <button class="btn-tool-pill active" id="btn-hotspot-toggle" onclick="toggleHotspotLayer()">
+                <i class="fa-solid fa-fire"></i> Hotspots
+              </button>
+              <button class="btn-tool-pill" id="btn-route-toggle" onclick="generateInspectionRoute()">
+                <i class="fa-solid fa-route"></i> Route
+              </button>
+            </div>
+          </div>
+
+          <div id="web-map-viewport"></div>
+
+          <div class="gis-map-footer">
+            <span>📍 Central Delhi GIS Grid</span>
+            <span>Click any beacon to view details & upvote</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. MUNICIPAL DISPATCH & ADMIN TABLE -->
+  <section id="dispatch-section">
+    <div class="container">
+      <div class="dispatch-queue-card">
+        <div class="dispatch-queue-header">
+          <div class="dispatch-queue-title">
+            <i class="fa-solid fa-shield-halved" style="color:var(--orange-main)"></i>
+            <span>Municipal Dispatch & Field Officer Queue</span>
+          </div>
+          <button class="btn-support-vote" onclick="generateInspectionRoute()">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Compute Inspection Route
+          </button>
+        </div>
+
+        <div class="dispatch-table-wrap">
+          <table class="queue-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Incident Headline</th>
+                <th>Category</th>
+                <th>Severity</th>
+                <th>AI Priority</th>
+                <th>Status</th>
+                <th>Dispatch Actions</th>
+              </tr>
+            </thead>
+            <tbody id="dispatch-queue-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. FLOATING TRANSLUCENT REPORT DAMAGE MODAL (WITH RIGHT-SIDE MAP) -->
+  <div id="report-modal-backdrop" onclick="if(event.target===this) closeReportModal()">
+    <div id="report-dialog-box">
+
+      <div class="modal-dialog-header">
+        <div class="modal-dialog-title">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span>FILE INFRASTRUCTURE DAMAGE REPORT</span>
+        </div>
+        <button class="modal-dialog-close" onclick="closeReportModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-two-col-body">
+
+        <!-- LEFT SIDE: STEPPER & FORM INPUTS -->
+        <div class="modal-form-side">
+          <div class="modal-stepper-bar">
+            <div class="stepper-node active" id="modal-step-1">
+              <span>01.</span> DAMAGE INFO
+            </div>
+            <i class="fa-solid fa-chevron-right" style="font-size:9px; color:#a1a1aa;"></i>
+            <div class="stepper-node" id="modal-step-2">
+              <span>02.</span> LOCATION & PHOTO
+            </div>
+            <i class="fa-solid fa-chevron-right" style="font-size:9px; color:#a1a1aa;"></i>
+            <div class="stepper-node" id="modal-step-3">
+              <span>03.</span> AI REVIEW
+            </div>
+          </div>
+
+          <div class="modal-pane-content">
+            <!-- STEP 1: DAMAGE INFORMATION -->
+            <div class="step-section-pane active" id="pane-1">
+              <div class="form-group-item">
+                <label class="form-field-label">Incident Headline / Title *</label>
+                <input type="text" id="inp-modal-title" class="form-text-input" placeholder="e.g., Deep Road Crater near Janpath Crossing" />
+              </div>
+
+              <div class="form-group-item">
+                <label class="form-field-label">Infrastructure Category *</label>
+                <div class="category-buttons-grid">
+                  <button class="cat-choice-btn selected" data-cat="Road" onclick="selectModalCategory('Road', this)">
+                    <i class="fa-solid fa-road"></i> <span>ROAD</span>
+                  </button>
+                  <button class="cat-choice-btn" data-cat="Lighting" onclick="selectModalCategory('Lighting', this)">
+                    <i class="fa-solid fa-lightbulb"></i> <span>LIGHTING</span>
+                  </button>
+                  <button class="cat-choice-btn" data-cat="Water" onclick="selectModalCategory('Water', this)">
+                    <i class="fa-solid fa-droplet"></i> <span>WATER</span>
+                  </button>
+                  <button class="cat-choice-btn" data-cat="Waste" onclick="selectModalCategory('Waste', this)">
+                    <i class="fa-solid fa-trash-can"></i> <span>WASTE</span>
+                  </button>
+                  <button class="cat-choice-btn" data-cat="Bridge" onclick="selectModalCategory('Bridge', this)">
+                    <i class="fa-solid fa-archway"></i> <span>BRIDGE</span>
+                  </button>
+                  <button class="cat-choice-btn" data-cat="Other" onclick="selectModalCategory('Other', this)">
+                    <i class="fa-solid fa-cubes-stacked"></i> <span>OTHER</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group-item">
+                <label class="form-field-label">Severity Level *</label>
+                <div class="severity-buttons-grid">
+                  <button class="sev-choice-btn selected" data-sev="Critical" onclick="selectModalSeverity('Critical', this)">CRIT</button>
+                  <button class="sev-choice-btn" data-sev="High" onclick="selectModalSeverity('High', this)">HIGH</button>
+                  <button class="sev-choice-btn" data-sev="Medium" onclick="selectModalSeverity('Medium', this)">MOD</button>
+                  <button class="sev-choice-btn" data-sev="Low" onclick="selectModalSeverity('Low', this)">LOW</button>
+                </div>
+              </div>
+
+              <div class="form-group-item">
+                <label class="form-field-label">Detailed Observations</label>
+                <textarea id="inp-modal-desc" class="form-textarea-input" placeholder="Describe hazard dimensions, traffic slowdown, or pedestrian risks..."></textarea>
+              </div>
+            </div>
+
+            <!-- STEP 2: LOCATION & PHOTO EVIDENCE -->
+            <div class="step-section-pane" id="pane-2">
+              <!-- GPS Bar -->
+              <div style="background:rgba(244,244,245,0.9); border:1.8px solid var(--border-dark); padding:10px 12px; display:flex; flex-direction:column; gap:6px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span style="font-family:var(--font-mono); font-size:11px; font-weight:800; background:#000; color:#fff; padding:2px 7px;" id="badge-modal-coords">28.63150, 77.21670</span>
+                  <button type="button" class="btn-support-vote" id="btn-gps-trigger" onclick="acquireUserGPS()">
+                    <i class="fa-solid fa-crosshairs"></i> ACQUIRE GPS
+                  </button>
+                </div>
+                <div style="font-size:11.5px; color:var(--text-muted); display:flex; align-items:center; gap:6px; overflow:hidden;">
+                  <i class="fa-solid fa-location-dot" style="color:var(--orange-main); flex-shrink:0;"></i>
+                  <span id="txt-modal-landmark" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Connaught Place, New Delhi</span>
+                </div>
+              </div>
+
+              <!-- Photo Upload -->
+              <div class="form-group-item">
+                <label class="form-field-label">Photo Evidence (Max 5.0 MB)</label>
+                <input type="file" id="modal-file-input" accept="image/*" style="display:none" onchange="onModalPhotoPicked(this)" />
+                
+                <div class="photo-dropzone-box" id="modal-dropzone" onclick="document.getElementById('modal-file-input').click()">
+                  <i class="fa-solid fa-camera-retro" style="font-size:24px; color:var(--orange-main);"></i>
+                  <div style="font-family:var(--font-mono); font-size:11.5px; font-weight:700;">Tap or Drag Photo to Attach</div>
+                  <div style="font-size:10.5px; color:var(--text-dim);">PNG, JPG, WEBP formats supported</div>
+                </div>
+
+                <div class="photo-preview-wrap" id="modal-preview-wrap">
+                  <img id="modal-preview-img" class="preview-render-img" src="" alt="Damage Preview" />
+                  <div class="preview-meta-bar">
+                    <span id="modal-preview-meta">photo.jpg</span>
+                    <button type="button" class="btn-support-vote" onclick="removeModalPhoto()" style="padding:2px 6px; font-size:10px; background:var(--red-main); color:#fff;">REMOVE</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 3: REVIEW & SUBMIT -->
+            <div class="step-section-pane" id="pane-3">
+              <div style="background:rgba(244,244,245,0.9); border:1.8px solid var(--border-dark); padding:12px; display:flex; flex-direction:column; gap:8px;">
+                <div style="display:flex; justify-content:space-between;">
+                  <span style="font-family:var(--font-mono); font-size:10px; color:var(--text-dim);">INCIDENT</span>
+                  <b style="font-size:12.5px;" id="rev-modal-title">—</b>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                  <span style="font-family:var(--font-mono); font-size:10px; color:var(--text-dim);">CATEGORY / SEVERITY</span>
+                  <b style="font-size:12.5px;" id="rev-modal-cat-sev">Road • Critical</b>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                  <span style="font-family:var(--font-mono); font-size:10px; color:var(--text-dim);">GIS LOCATION</span>
+                  <b style="font-family:var(--font-mono); font-size:11.5px;" id="rev-modal-coords">28.63150, 77.21670</b>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                  <span style="font-family:var(--font-mono); font-size:10px; color:var(--text-dim);">PHOTO EVIDENCE</span>
+                  <b style="font-size:11.5px; color:var(--green-main);" id="rev-modal-photo">No photo attached</b>
+                </div>
+              </div>
+
+              <div style="background:#fff; border:1.8px solid var(--border-dark); padding:10px 12px; box-shadow:var(--shadow-brutal-sm); display:flex; align-items:center; gap:10px;">
+                <i class="fa-solid fa-microchip" style="font-size:20px; color:var(--orange-main);"></i>
+                <div>
+                  <div style="font-family:var(--font-mono); font-size:11px; font-weight:800;" id="rev-modal-prio">AI PRIORITY: P1 CRITICAL</div>
+                  <div style="font-size:10.5px; color:var(--text-muted);">Spatial matrix calculated. Priority dispatch queued.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-dialog-footer">
+            <button type="button" class="btn-step-back" id="btn-modal-back" onclick="navigateModalStep(-1)" style="display:none;">
+              <i class="fa-solid fa-arrow-left"></i> BACK
+            </button>
+            <button type="button" class="btn-step-next" id="btn-modal-next" onclick="navigateModalStep(1)">
+              <span>NEXT: LOCATION & PHOTO</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE: INTEGRATED INTERACTIVE GIS MAP -->
+        <div class="modal-map-side">
+          <div class="modal-map-top-bar">
+            <div class="modal-map-top-title">
+              <i class="fa-solid fa-crosshairs" style="color:var(--orange-main);"></i>
+              <span>GIS LOCATION SPOTTER</span>
+            </div>
+            <div class="modal-map-layers-switch">
+              <button type="button" class="modal-map-layer-btn active" id="modal-side-street-btn" onclick="switchModalSideMapLayer('street')">STREET</button>
+              <button type="button" class="modal-map-layer-btn" id="modal-side-sat-btn" onclick="switchModalSideMapLayer('sat')">SATELLITE</button>
+            </div>
+          </div>
+
+          <!-- The Leaflet Map Container -->
+          <div id="modal-side-map-view"></div>
+
+          <div class="modal-map-bottom-bar">
+            <div class="modal-map-coords-row">
+              <span class="modal-map-coords-badge" id="modal-map-bottom-badge">28.63150, 77.21670</span>
+              <span style="font-size:10px; color:var(--text-dim);"><i class="fa-solid fa-hand-pointer"></i> Click/drag pin to adjust</span>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+              <i class="fa-solid fa-location-dot" style="color:var(--orange-main); font-size:10px;"></i>
+              <span id="modal-map-bottom-landmark">Connaught Place, New Delhi</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submission Progress Overlay -->
+        <div id="submission-progress-overlay">
+          <div class="progress-spinner" id="modal-spinner"></div>
+          <div style="font-size:36px; color:var(--green-main); display:none;" id="modal-success-icon">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+          <div style="font-family:var(--font-mono); font-size:14px; font-weight:800; color:var(--yellow-main);" id="modal-sub-title">TRANSMITTING TELEMETRY...</div>
+          <div style="font-size:12px; color:#a1a1aa;" id="modal-sub-sub">1/4: Uploading telemetry package and photo verification...</div>
+          <button class="btn-hero-orange" id="btn-modal-done" onclick="closeSubmission()" style="display:none; margin-top:10px;">
+            DONE
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 7. TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container"></div>
+
+  <!-- 8. FOOTER -->
+  <footer id="footer">
+    <div class="container">
+      <div class="footer-wrapper">
+        <div style="font-family:var(--font-mono); font-size:12px;">
+          INFRAcare © 2026 — Smart India Hackathon | Municipal Engineering & Spatial GIS Platform
+        </div>
+        <div style="font-family:var(--font-mono); font-size:11px;">
+          FastAPI Backend • SQLite GIS • Leaflet Engine • Priority Matrix Active
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       9. JAVASCRIPT ENGINE
+       ========================================================================== -->
+  <script>
+    const API_BASE = '/api';
+    const ESRI_SAT_URL = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+    const OSM_STR_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+    // State
+    let map = null;
+    let satLayer = null, strLayer = null;
+    let isSatellite = true;
+    let markersLayer = L.layerGroup();
+    let hotspotLayer = L.layerGroup();
+    let routeLayer = null;
+    let pinMarker = null;
+
+    let reportsData = [];
+    let currentFilter = 'ALL';
+    let searchQuery = '';
+    let currentStep = 1;
+    let selectedCategory = 'Road';
+    let selectedSeverity = 'Critical';
+    let currentLat = 28.63150;
+    let currentLng = 77.21670;
+    let selectedPhoto = null;
+    let currentRole = 'citizen';
+
+    // ── INITIALIZATION ────────────────────────────────────────────────────────
+    window.addEventListener('DOMContentLoaded', () => {
+      initMap();
+      setupDropzone();
+      startSyncClock();
+      fetchReports();
+    if (window.InfracareStore) InfracareStore.onSync(() => fetchReports(false));
+      pollNotifications();
+      setInterval(fetchReports, 10000);
+      setInterval(pollNotifications, 15000);
+    });
+
+    function startSyncClock() {
+      let seconds = 252;
+      setInterval(() => {
+        seconds++;
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        const formatted = `SYNC 00:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        const el = document.getElementById('sync-timer-val');
+        if (el) el.textContent = formatted;
+      }, 1000);
+    }
+
+    // ── MAP INITIALIZATION ────────────────────────────────────────────────────
+    function initMap() {
+      const mapEl = document.getElementById('web-map-viewport');
+      if (!mapEl) return;
+
+      map = L.map('web-map-viewport', { zoomControl: false }).setView([28.63150, 77.21670], 14);
+      satLayer = L.tileLayer(ESRI_SAT_URL, { maxZoom: 19, attribution: 'Imagery © Esri' }).addTo(map);
+      strLayer = L.tileLayer(OSM_STR_URL, { maxZoom: 19, attribution: '© OpenStreetMap' });
+      
+      markersLayer.addTo(map);
+      hotspotLayer.addTo(map);
+      L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+      map.on('click', (e) => {
+        updateLocationPin(e.latlng.lat, e.latlng.lng);
+      });
+    }
+
+    function toggleMapLayer() {
+      isSatellite = !isSatellite;
+      const btn = document.getElementById('btn-tile-switch');
+      if (isSatellite) {
+        map.removeLayer(strLayer);
+        satLayer.addTo(map);
+        if (btn) btn.innerHTML = '<i class="fa-solid fa-satellite"></i> Satellite';
+        showToast('High-Res Satellite imagery enabled', 'info');
+      } else {
+        map.removeLayer(satLayer);
+        strLayer.addTo(map);
+        if (btn) btn.innerHTML = '<i class="fa-solid fa-map"></i> Street';
+        showToast('Street Vector map enabled', 'info');
+      }
+    }
+
+    function toggleHotspotLayer() {
+      const btn = document.getElementById('btn-hotspot-toggle');
+      if (map.hasLayer(hotspotLayer)) {
+        map.removeLayer(hotspotLayer);
+        if (btn) btn.classList.remove('active');
+        showToast('Hotspot heatmap hidden', 'info');
+      } else {
+        hotspotLayer.addTo(map);
+        if (btn) btn.classList.add('active');
+        showToast('Hotspot heatmap active', 'success');
+      }
+    }
+
+    // ── DATA FETCHING & RENDERING ───────────────────────────────────────────
+    async function fetchReports(showNotice = false) {
+      try {
+        const res = await fetch(`${API_BASE}/reports`);
+        if (res.ok) {
+          reportsData = await res.json();
+          if (window.InfracareStore) {
+            // Keep store updated with backend if online
+            reportsData.forEach(r => InfracareStore.upsert(r));
+          }
+        } else {
+          throw new Error('API not available');
+        }
+      } catch (err) {
+        // Resilient fallback to InfracareStore (Vercel / static / offline)
+        if (window.InfracareStore) {
+          reportsData = InfracareStore.getReports();
+        }
+      }
+      updateKpis();
+      renderFeed();
+      renderMarkers();
+      renderDispatchTable();
+      if (showNotice) showToast(`Synced ${reportsData.length} records with Municipal Registry`, 'info');
+    }
+
+    function updateKpis() {
+      const total = reportsData.length;
+      const critical = reportsData.filter(r => r.severity === 'Critical' || r.priority === 'P1').length;
+      const inProg = reportsData.filter(r => r.status === 'Assigned' || r.status === 'In_Progress').length;
+      const resolved = reportsData.filter(r => r.status === 'Resolved').length;
+
+      document.getElementById('kpi-total-val').textContent = total;
+      document.getElementById('kpi-crit-val').textContent = critical;
+      document.getElementById('kpi-prog-val').textContent = inProg;
+      document.getElementById('kpi-res-val').textContent = resolved;
+    }
+
+    function filterByUrgency(cat) {
+      currentFilter = cat;
+      document.querySelectorAll('.filter-chip-btn').forEach(c => c.classList.remove('active'));
+      const chip = document.getElementById(`chip-${cat.toLowerCase()}`);
+      if (chip) chip.classList.add('active');
+      renderFeed();
+      showToast(`Filter: ${cat}`, 'info');
+    }
+
+    function onSearchQuery(q) {
+      searchQuery = q.toLowerCase();
+      renderFeed();
+    }
+
+    
+    // ── PHOTO EXTRACTION & LIGHTBOX HANDLERS ─────────────────────────────────
+    function getReportPhotos(r) {
+      const photos = [];
+      if (r.images && Array.isArray(r.images)) {
+        photos.push(...r.images.filter(Boolean));
+      }
+      if (r.photos && Array.isArray(r.photos)) {
+        photos.push(...r.photos.filter(Boolean));
+      }
+      if (r.image_url) {
+        if (typeof r.image_url === 'string') {
+          const str = r.image_url.trim();
+          if (str.startsWith('[') && str.endsWith(']')) {
+            try {
+              const parsed = JSON.parse(str);
+              if (Array.isArray(parsed)) photos.push(...parsed.filter(Boolean));
+            } catch(e) {
+              photos.push(str);
+            }
+          } else if (str.includes(',')) {
+            photos.push(...str.split(',').map(s => s.trim()).filter(Boolean));
+          } else {
+            photos.push(str);
+          }
+        }
+      }
+      return [...new Set(photos)];
+    }
+
+    function toggleEvidence(id, btn) {
+      const drawer = document.getElementById(`evidence-drawer-${id}`);
+      if (!drawer) return;
+      const isOpen = drawer.classList.toggle('open');
+      btn.classList.toggle('active', isOpen);
+      const span = btn.querySelector('span');
+      const count = btn.getAttribute('data-count') || '1';
+      if (span) {
+        span.textContent = isOpen ? `Hide Evidence (${count})` : `Show Evidence (${count})`;
+      }
+    }
+
+    function openPhotoLightbox(src, title) {
+      const modal = document.getElementById('photo-lightbox-modal');
+      const img = document.getElementById('lightbox-img');
+      const titleEl = document.getElementById('lightbox-title');
+      const caption = document.getElementById('lightbox-caption');
+
+      if (!modal || !img) return;
+      img.src = src;
+      if (titleEl) titleEl.textContent = `EVIDENCE: ${title.toUpperCase()}`;
+      if (caption) caption.textContent = `Source: ${src}`;
+      modal.classList.add('open');
+    }
+
+    function closePhotoLightbox() {
+      const modal = document.getElementById('photo-lightbox-modal');
+      if (modal) modal.classList.remove('open');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closePhotoLightbox();
+      }
+    });
+
+    function renderFeed() {
+      const feed = document.getElementById('incidents-feed-wrap');
+      if (!feed) return;
+
+      let list = reportsData;
+      if (currentFilter === 'CRITICAL') {
+        list = list.filter(r => r.severity === 'Critical' || r.priority === 'P1');
+      } else if (currentFilter === 'MODERATE') {
+        list = list.filter(r => r.severity === 'High' || r.severity === 'Medium');
+      } else if (currentFilter === 'LOW') {
+        list = list.filter(r => r.severity === 'Low');
+      } else if (currentFilter === 'IN_PROGRESS') {
+        list = list.filter(r => r.status === 'Assigned' || r.status === 'In_Progress');
+      } else if (currentFilter === 'RESOLVED') {
+        list = list.filter(r => r.status === 'Resolved');
+      }
+
+      if (searchQuery) {
+        list = list.filter(r => (r.title||'').toLowerCase().includes(searchQuery) || (r.description||'').toLowerCase().includes(searchQuery));
+      }
+
+      if (!list.length) {
+        feed.innerHTML = `
+          <div style="text-align:center; padding:36px; border:2px dashed #000; background:#fff;">
+            <i class="fa-solid fa-box-open" style="font-size:28px; color:#a1a1aa; margin-bottom:8px;"></i>
+            <div style="font-family:var(--font-mono); font-size:13px; font-weight:800;">NO INCIDENTS MATCHING CRITERIA</div>
+            <div style="font-size:12px; color:#71717a;">Try changing your filter or search query.</div>
+          </div>
+        `;
+        return;
+      }
+
+      feed.innerHTML = list.map(r => {
+        const photos = getReportPhotos(r);
+        const prioKey = r.priority && r.priority.startsWith('P') ? r.priority : (r.severity === 'Critical' ? 'P1' : r.severity === 'High' ? 'P2' : 'P3');
+        const statKey = (r.status || 'reported').toLowerCase();
+
+        let evidenceHtml = '';
+        if (photos.length > 0) {
+          evidenceHtml = `
+            <div class="evidence-toggle-wrap">
+              <button class="btn-evidence-toggle" data-count="${photos.length}" onclick="toggleEvidence(${r.id}, this)" id="btn-evidence-${r.id}">
+                <i class="fa-solid fa-camera"></i>
+                <span>Show Evidence (${photos.length})</span>
+                <i class="fa-solid fa-chevron-down arrow-icon"></i>
+              </button>
+
+              <div class="evidence-drawer" id="evidence-drawer-${r.id}">
+                <div class="evidence-photos-track">
+                  ${photos.map((src, idx) => `
+                    <div class="evidence-photo-item" onclick="openPhotoLightbox('${src}', '${esc(r.title)}')" title="Click to view full size">
+                      <img src="${src}" class="evidence-scroll-img" alt="Evidence ${idx+1}" loading="lazy" />
+                      <div class="photo-overlay-zoom">
+                        <i class="fa-solid fa-magnifying-glass-plus"></i>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+                ${photos.length > 1 ? `<div class="evidence-scroll-hint"><i class="fa-solid fa-arrows-left-right"></i> ${photos.length} photos available • Scroll horizontally to view all</div>` : `<div class="evidence-scroll-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Tap photo to view full resolution</div>`}
+              </div>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="incident-item-card" id="inc-card-${r.id}">
+            <div class="item-card-top">
+              <span class="item-id-tag">#${r.id}</span>
+              <div class="item-badge-group">
+                <span class="prio-badge ${prioKey}">${prioKey}</span>
+                <span class="status-badge ${statKey}">${r.status}</span>
+              </div>
+            </div>
+
+            <div class="incident-item-title">${esc(r.title)}</div>
+            <div class="incident-item-desc">${esc(r.description || 'No additional notes provided.')}</div>
+
+            ${evidenceHtml}
+
+            <div class="item-card-footer">
+              <div class="item-coords-stamp">
+                <i class="fa-solid fa-location-dot" style="color:var(--orange-main)"></i>
+                <span>${r.latitude.toFixed(4)}, ${r.longitude.toFixed(4)} (${r.category})</span>
+              </div>
+              <div class="item-action-btns">
+                <button class="btn-support-vote" onclick="supportIncident(${r.id})">
+                  <i class="fa-solid fa-thumbs-up"></i> ${r.support_count || 0} Votes
+                </button>
+                <button class="btn-locate-map" onclick="flyToLocation(${r.latitude}, ${r.longitude})">
+                  <i class="fa-solid fa-crosshairs"></i> View on Map
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderMarkers() {
+      markersLayer.clearLayers();
+      hotspotLayer.clearLayers();
+
+      const colorMap = {
+        Critical: '#ef4444',
+        High: '#f97316',
+        Medium: '#06b6d4',
+        Low: '#10b981'
+      };
+
+      reportsData.forEach(r => {
+        const color = colorMap[r.severity] || '#ff4800';
+        const icon = L.divIcon({
+          className: 'custom-beacon',
+          html: `
+            <div class="pulse-marker-beacon">
+              <div class="beacon-wave" style="background:${color}"></div>
+              <div class="beacon-core" style="background:${color}"></div>
+            </div>
+          `,
+          iconSize: [22, 22],
+          iconAnchor: [11, 11]
+        });
+
+        const popupContent = `
+          <div style="font-family:var(--font-sans); color:#000; min-width:190px;">
+            ${r.image_url ? `<img src="${r.image_url}" style="width:100%; height:95px; object-fit:cover; border:1.5px solid #000; margin-bottom:6px;" />` : ''}
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <b style="font-family:var(--font-mono); font-size:10px;">#${r.id}</b>
+              <span style="font-family:var(--font-mono); font-size:10px; font-weight:800; color:${color};">${r.priority || 'P1'}</span>
+            </div>
+            <div style="font-weight:800; font-size:13px; margin-bottom:4px;">${esc(r.title)}</div>
+            <div style="font-size:11px; color:#52525b; margin-bottom:8px;">${esc(r.description||'')}</div>
+            <button onclick="supportIncident(${r.id})" style="background:var(--orange-main); color:#fff; border:1.5px solid #000; font-family:var(--font-mono); font-size:10.5px; font-weight:800; padding:5px 8px; cursor:pointer; width:100%;">
+              ▲ SUPPORT (${r.support_count || 0} VOTES)
+            </button>
+          </div>
+        `;
+
+        const m = L.marker([r.latitude, r.longitude], { icon }).bindPopup(popupContent);
+        markersLayer.addLayer(m);
+
+        if (r.severity === 'Critical' || (r.support_count || 0) > 4) {
+          const circle = L.circle([r.latitude, r.longitude], {
+            radius: 80,
+            color: '#ef4444',
+            fillColor: '#ef4444',
+            fillOpacity: 0.18,
+            weight: 1.5
+          });
+          hotspotLayer.addLayer(circle);
+        }
+      });
+    }
+
+    function flyToLocation(lat, lng) {
+      document.getElementById('web-map-viewport').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => {
+        map.flyTo([lat, lng], 17, { duration: 1.6 });
+      }, 200);
+      showToast(`Focusing camera on coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}`, 'info');
+    }
+
+    // ── GEOLOCATION WITH PULSE RADAR ─────────────────────────────────────────
+    async function acquireUserGPS() {
+      const btn = document.getElementById('btn-gps-trigger');
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> LOCATING...';
+      showToast('Finding exact GPS position...', 'info');
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-crosshairs"></i> ACQUIRE GPS';
+            map.flyTo([lat, lng], 17, { duration: 1.8 });
+            if (modalSideMap) modalSideMap.flyTo([lat, lng], 16, { duration: 1.5 });
+            drawRadar(lat, lng);
+            await updateLocationPin(lat, lng);
+            showToast(`GPS Position Locked (${lat.toFixed(4)}, ${lng.toFixed(4)})`, 'success');
+          },
+          async () => {
+            await fallbackIp(btn);
+          },
+          { enableHighAccuracy: true, timeout: 6000 }
+        );
+      } else {
+        await fallbackIp(btn);
+      }
+    }
+
+    async function fallbackIp(btn) {
+      try {
+        const res = await fetch('https://ipwho.is/');
+        const data = await res.json();
+        if (btn) btn.innerHTML = '<i class="fa-solid fa-crosshairs"></i> ACQUIRE GPS';
+        if (data.success && data.latitude && data.longitude) {
+          const lat = data.latitude;
+          const lng = data.longitude;
+          map.flyTo([lat, lng], 15, { duration: 1.8 });
+          drawRadar(lat, lng);
+          await updateLocationPin(lat, lng, `${data.city}, ${data.region}`);
+          showToast(`Position acquired via network: ${data.city}`, 'success');
+          return;
+        }
+      } catch (e) {}
+
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-crosshairs"></i> ACQUIRE GPS';
+      await updateLocationPin(28.63150, 77.21670, 'Connaught Place, New Delhi');
+      showToast('Set to Central Delhi Demo Coordinates', 'info');
+    }
+
+    function drawRadar(lat, lng) {
+      const c = L.circle([lat, lng], { radius: 45, color: '#ff4800', fillColor: '#ff4800', fillOpacity: 0.3, weight: 2 }).addTo(map);
+      setTimeout(() => map.removeLayer(c), 3000);
+      if (modalSideMap) {
+        const c2 = L.circle([lat, lng], { radius: 45, color: '#ff4800', fillColor: '#ff4800', fillOpacity: 0.3, weight: 2 }).addTo(modalSideMap);
+        setTimeout(() => modalSideMap.removeLayer(c2), 3000);
+      }
+    }
+
+    async function updateLocationPin(lat, lng, customLandmark = null) {
+      currentLat = lat;
+      currentLng = lng;
+
+      const badge = document.getElementById('badge-modal-coords');
+      if (badge) badge.textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+
+      const rev = document.getElementById('rev-modal-coords');
+      if (rev) rev.textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+
+      if (customLandmark) {
+        document.getElementById('txt-modal-landmark').textContent = customLandmark;
+      } else {
+        reverseGeocode(lat, lng);
+      }
+
+      const pinIcon = L.divIcon({
+        className: 'custom-pin',
+        html: `
+          <div class="pulse-marker-beacon">
+            <div class="beacon-wave" style="background:#ff4800"></div>
+            <div class="beacon-core" style="background:#ff4800"></div>
+          </div>
+        `,
+        iconSize: [22, 22],
+        iconAnchor: [11, 11]
+      });
+
+      if (pinMarker) map.removeLayer(pinMarker);
+      pinMarker = L.marker([lat, lng], { icon: pinIcon, draggable: true }).addTo(map);
+      pinMarker.on('dragend', async (ev) => {
+        const pt = ev.target.getLatLng();
+        await updateLocationPin(pt.lat, pt.lng);
+      });
+      updateModalSideMarker(lat, lng);
+      const sideB = document.getElementById('modal-map-bottom-badge');
+      if (sideB) sideB.textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    }
+
+    async function reverseGeocode(lat, lng) {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=16`);
+        if (res.ok) {
+          const data = await res.json();
+          const name = data.display_name ? data.display_name.split(',').slice(0, 3).join(', ') : 'Detected GIS Location';
+          document.getElementById('txt-modal-landmark').textContent = name;
+        }
+      } catch(e) {
+        document.getElementById('txt-modal-landmark').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      }
+    }
+
+    // ── PHOTO UPLOAD & DRAG DROP ─────────────────────────────────────────────
+    function setupDropzone() {
+      const dropzone = document.getElementById('modal-dropzone');
+      if (!dropzone) return;
+      ['dragenter', 'dragover'].forEach(name => {
+        dropzone.addEventListener(name, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.style.background = '#e2e8f0';
+          dropzone.style.borderColor = 'var(--orange-main)';
+        }, false);
+      });
+      ['dragleave', 'drop'].forEach(name => {
+        dropzone.addEventListener(name, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.style.background = '#f8fafc';
+          dropzone.style.borderColor = 'var(--border-dark)';
+        }, false);
+      });
+      dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        if (dt.files && dt.files.length) {
+          const input = document.getElementById('modal-file-input');
+          input.files = dt.files;
+          onModalPhotoPicked(input);
+        }
+      }, false);
+    }
+
+    function onModalPhotoPicked(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('Image exceeds 5MB limit. Please attach a smaller photo.', 'danger');
+        input.value = '';
+        return;
+      }
+
+      selectedPhoto = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('modal-preview-img').src = e.target.result;
+        document.getElementById('modal-preview-meta').textContent = `${file.name} • ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+        document.getElementById('modal-preview-wrap').classList.add('show');
+        document.getElementById('modal-dropzone').style.display = 'none';
+        document.getElementById('rev-modal-photo').textContent = `✓ ${file.name}`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeModalPhoto() {
+      selectedPhoto = null;
+      document.getElementById('modal-file-input').value = '';
+      document.getElementById('modal-preview-wrap').classList.remove('show');
+      document.getElementById('modal-dropzone').style.display = 'flex';
+      document.getElementById('rev-modal-photo').textContent = 'No photo';
+    }
+
+    // ── MODAL STEPPER & SUBMISSION ───────────────────────────────────────────
+    function openReportModal() {
+      document.getElementById('report-modal-backdrop').classList.add('open');
+      setModalStep(1);
+      updateLocationPin(currentLat, currentLng);
+      initModalSideMap();
+    }
+    function closeReportModal() {
+      document.getElementById('report-modal-backdrop').classList.remove('open');
+    }
+
+    function selectModalCategory(cat, el) {
+      selectedCategory = cat;
+      document.querySelectorAll('.cat-choice-btn').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function selectModalSeverity(sev, el) {
+      selectedSeverity = sev;
+      document.querySelectorAll('.sev-choice-btn').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function navigateModalStep(dir) {
+      if (dir === 1) {
+        if (currentStep === 1) {
+          const t = document.getElementById('inp-modal-title').value.trim();
+          if (!t) {
+            showToast('Please enter an incident headline', 'warning');
+            return;
+          }
+          setModalStep(2);
+        } else if (currentStep === 2) {
+          setModalStep(3);
+        } else if (currentStep === 3) {
+          submitReport();
+        }
+      } else {
+        if (currentStep > 1) setModalStep(currentStep - 1);
+      }
+    }
+
+    function setModalStep(step) {
+      currentStep = step;
+      document.querySelectorAll('.step-section-pane').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.stepper-node').forEach((node, i) => {
+        node.classList.remove('active', 'completed');
+        if (i + 1 === step) node.classList.add('active');
+        if (i + 1 < step) node.classList.add('completed');
+      });
+
+      document.getElementById(`pane-${step}`).classList.add('active');
+
+      const backBtn = document.getElementById('btn-modal-back');
+      const nextBtn = document.getElementById('btn-modal-next');
+
+      if (step === 1) {
+        backBtn.style.display = 'none';
+        nextBtn.innerHTML = '<span>NEXT: LOCATION & PHOTO</span> <i class="fa-solid fa-arrow-right"></i>';
+      } else if (step === 2) {
+        backBtn.style.display = 'block';
+        nextBtn.innerHTML = '<span>NEXT: AI REVIEW</span> <i class="fa-solid fa-arrow-right"></i>';
+      } else if (step === 3) {
+        backBtn.style.display = 'block';
+        nextBtn.innerHTML = '<span>TRANSMIT TELEMETRY</span> <i class="fa-solid fa-paper-plane"></i>';
+
+        document.getElementById('rev-modal-title').textContent = document.getElementById('inp-modal-title').value || '—';
+        document.getElementById('rev-modal-cat-sev').textContent = `${selectedCategory} • ${selectedSeverity}`;
+        const prio = selectedSeverity === 'Critical' ? 'P1 CRITICAL' : selectedSeverity === 'High' ? 'P2 HIGH' : 'P3 MEDIUM';
+        document.getElementById('rev-modal-prio').textContent = `AI PRIORITY: ${prio}`;
+      }
+    }
+
+    async function submitReport() {
+      const overlay = document.getElementById('submission-progress-overlay');
+      const title = document.getElementById('modal-sub-title');
+      const sub = document.getElementById('modal-sub-sub');
+      const spinner = document.getElementById('modal-spinner');
+      const check = document.getElementById('modal-success-icon');
+      const doneBtn = document.getElementById('btn-modal-done');
+
+      overlay.classList.add('show');
+      spinner.style.display = 'block';
+      check.style.display = 'none';
+      doneBtn.style.display = 'none';
+
+      title.textContent = 'TRANSMITTING TELEMETRY...';
+      sub.textContent = '1/4: Uploading telemetry package and photo verification...';
+      await delay(400);
+
+      sub.textContent = '2/4: Verifying GIS spatial coordinates...';
+      await delay(350);
+
+      sub.textContent = '3/4: Querying municipal duplicate radar database...';
+
+      const fd = new FormData();
+      fd.append('title', document.getElementById('inp-modal-title').value.trim());
+      fd.append('description', document.getElementById('inp-modal-desc').value.trim());
+      fd.append('category', selectedCategory);
+      fd.append('severity', selectedSeverity);
+      fd.append('latitude', currentLat);
+      fd.append('longitude', currentLng);
+      if (selectedPhoto) fd.append('image', selectedPhoto);
+
+      let savedReport = null;
+      try {
+        const res = await fetch(`${API_BASE}/reports`, { method: 'POST', body: fd });
+        if (res.ok) {
+          savedReport = await res.json();
+        }
+      } catch (e) {
+        console.warn('Backend offline or static hosting on Vercel, saving to InfracareStore');
+      }
+
+      // Always save or mirror in InfracareStore so Citizen and Admin portals sync instantly
+      if (window.InfracareStore) {
+        if (!savedReport) {
+          const priority = selectedSeverity === 'Critical' ? 'P1' : (selectedSeverity === 'High' ? 'P2' : 'P3');
+          savedReport = InfracareStore.addReport({
+            title: document.getElementById('inp-modal-title').value.trim() || 'Civic Infrastructure Alert',
+            description: document.getElementById('inp-modal-desc').value.trim() || 'Reported via Citizen Mobile Telemetry Terminal',
+            category: selectedCategory,
+            severity: selectedSeverity,
+            priority: priority,
+            latitude: currentLat,
+            longitude: currentLng,
+            status: 'reported',
+            address: currentLat.toFixed(4) + ', ' + currentLng.toFixed(4) + ' (Connaught Place, New Delhi)'
+          });
+        } else {
+          InfracareStore.upsert(savedReport);
+        }
+      }
+
+      if (savedReport) {
+        sub.textContent = '4/4: Calculating city-wide AI priority index...';
+        await delay(350);
+
+        spinner.style.display = 'none';
+        check.style.display = 'block';
+        title.textContent = `INCIDENT LOGGED: IC-#${savedReport.id}`;
+        sub.textContent = `Triage Priority: ${savedReport.priority || 'P1'} • Dispatch Status: Reported`;
+        doneBtn.style.display = 'inline-flex';
+
+        // Reset
+        document.getElementById('inp-modal-title').value = '';
+        document.getElementById('inp-modal-desc').value = '';
+        removeModalPhoto();
+        await fetchReports();
+      } else {
+        overlay.classList.remove('show');
+        showToast('Error connecting to backend database', 'danger');
+      }
+    }
+
+    function closeSubmission() {
+      document.getElementById('submission-progress-overlay').classList.remove('show');
+      closeReportModal();
+      showToast('Incident filed successfully in municipal registry', 'success');
+    }
+
+    async function supportIncident(id) {
+      let backed = false;
+      try {
+        const res = await fetch(`${API_BASE}/reports/${id}/support?user_id=2`, { method: 'POST' });
+        if (res.ok) backed = true;
+      } catch (e) {}
+
+      if (window.InfracareStore) {
+        InfracareStore.addSupport(id);
+        backed = true;
+      }
+
+      if (backed) {
+        showToast(`Community support recorded for Incident #${id}!`, 'success');
+        fetchReports();
+      }
+    }
+
+    // ── DISPATCH TABLE & ADMIN OPERATIONS ────────────────────────────────────
+    function renderDispatchTable() {
+      const tbody = document.getElementById('dispatch-queue-tbody');
+      if (!tbody) return;
+
+      if (!reportsData.length) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:18px; color:var(--text-dim);">No incidents in registry.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = reportsData.map(r => {
+        const prioKey = r.priority && r.priority.startsWith('P') ? r.priority : (r.severity === 'Critical' ? 'P1' : r.severity === 'High' ? 'P2' : 'P3');
+        const statKey = (r.status || 'reported').toLowerCase();
+
+        return `
+          <tr>
+            <td><b>#${r.id}</b></td>
+            <td><b>${esc(r.title)}</b></td>
+            <td>${r.category}</td>
+            <td>${r.severity}</td>
+            <td><span class="prio-badge ${prioKey}">${prioKey}</span></td>
+            <td><span class="status-badge ${statKey}">${r.status}</span></td>
+            <td>
+              ${r.status === 'Reported' ? `<button class="btn-support-vote" onclick="updateReportStatus(${r.id}, 'Verified')"><i class="fa-solid fa-check"></i> Verify</button>` : ''}
+              ${r.status === 'Verified' ? `<button class="btn-support-vote" onclick="assignOfficer(${r.id}, 3)" style="background:var(--orange-main); color:#fff;"><i class="fa-solid fa-user-plus"></i> Assign #3</button>` : ''}
+              ${r.status === 'Assigned' ? `<button class="btn-support-vote" onclick="updateReportStatus(${r.id}, 'In_Progress')" style="background:#000; color:#fff;"><i class="fa-solid fa-truck-fast"></i> Inspect</button>` : ''}
+              ${r.status === 'In_Progress' ? `<button class="btn-support-vote" onclick="updateReportStatus(${r.id}, 'Resolved')" style="background:var(--green-main); color:#fff;"><i class="fa-solid fa-check-double"></i> Resolve</button>` : ''}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function updateReportStatus(id, newStatus) {
+      let updated = false;
+      try {
+        const res = await fetch(`${API_BASE}/reports/${id}/status?new_status=${newStatus}`, { method: 'PUT' });
+        if (res.ok) updated = true;
+      } catch (e) {}
+
+      if (window.InfracareStore) {
+        InfracareStore.updateStatus(id, newStatus);
+        updated = true;
+      }
+
+      if (updated) {
+        showToast(`Report #${id} moved to ${newStatus}`, 'success');
+        fetchReports();
+      }
+    }
+
+    async function assignOfficer(reportId, officerId) {
+      let assigned = false;
+      try {
+        const res = await fetch(`${API_BASE}/reports/${reportId}/assign?officer_id=${officerId}`, { method: 'POST' });
+        if (res.ok) assigned = true;
+      } catch (e) {}
+
+      if (window.InfracareStore) {
+        InfracareStore.assignOfficer(reportId, officerId);
+        assigned = true;
+      }
+
+      if (assigned) {
+        showToast(`Report #${reportId} assigned to Field Officer #${officerId}!`, 'success');
+        fetchReports();
+      }
+    }
+
+    async function generateInspectionRoute() {
+      try {
+        const res = await fetch(`${API_BASE}/route?officer_id=3`);
+        const data = await res.json();
+
+        if (routeLayer) map.removeLayer(routeLayer);
+
+        if (data.route && data.route.length > 1) {
+          const latlngs = data.route.map(pt => [pt.lat, pt.lng]);
+          routeLayer = L.polyline(latlngs, {
+            color: '#ff4800',
+            weight: 4,
+            opacity: 0.9,
+            dashArray: '8, 12'
+          }).addTo(map);
+
+          map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
+          showToast(`Inspection route computed with ${data.route.length} stops!`, 'success');
+        } else {
+          showToast('Route calculated for today\'s inspection tasks', 'info');
+        }
+      } catch (e) {}
+    }
+
+    function onRoleSwitched(role) {
+      if (role === 'admin') {
+        showToast('Switching to Municipal Admin portal...', 'info');
+        setTimeout(() => {
+          window.location.href = '/admin';
+        }, 150);
+      } else {
+        currentRole = role;
+        showToast('Active profile: Citizen Reporter', 'info');
+      }
+    }
+
+    async function pollNotifications() {
+      try {
+        const res = await fetch(`${API_BASE}/notifications?user_id=2`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.length > 0) {
+          data.forEach(n => showToast(n.message, 'info'));
+        }
+      } catch (e) {}
+    }
+
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = 'toast-card';
+      const icon = type === 'success' ? 'fa-circle-check' : type === 'danger' ? 'fa-triangle-exclamation' : 'fa-circle-info';
+      const color = type === 'success' ? 'var(--green-main)' : type === 'danger' ? 'var(--red-main)' : 'var(--orange-main)';
+      toast.innerHTML = `<i class="fa-solid ${icon}" style="color:${color}"></i> <span>${esc(msg)}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+
+    function esc(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+  </script>
+
+  <!-- PHOTO LIGHTBOX MODAL -->
+  <div id="photo-lightbox-modal" onclick="if(event.target===this) closePhotoLightbox()">
+    <div style="background:#ffffff; border:3px solid var(--border-dark); box-shadow:var(--shadow-brutal-lg); max-width:850px; width:100%; max-height:92vh; display:flex; flex-direction:column; overflow:hidden; animation:modalFloat 0.2s ease;">
+      <div style="background:#0a0e17; color:#ffffff; padding:12px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border-dark);">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-camera" style="color:var(--orange-main);"></i>
+          <span style="font-family:var(--font-mono); font-size:12.5px; font-weight:800;" id="lightbox-title">EVIDENCE PHOTO VIEWER</span>
+        </div>
+        <button class="modal-dialog-close" onclick="closePhotoLightbox()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div style="padding:16px; background:#000000; display:flex; align-items:center; justify-content:center; max-height:75vh; overflow:hidden;">
+        <img id="lightbox-img" src="" alt="Full Evidence Photo" style="max-width:100%; max-height:70vh; object-fit:contain; border:1px solid #334155;" />
+      </div>
+      <div style="background:#f4f4f5; border-top:2px solid var(--border-dark); padding:10px 18px; display:flex; justify-content:space-between; align-items:center; font-family:var(--font-mono); font-size:11px;">
+        <span id="lightbox-caption" style="color:var(--text-muted);">Verified Municipal Evidence Asset</span>
+        <button class="btn-support-vote" onclick="closePhotoLightbox()">CLOSE [ESC]</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
