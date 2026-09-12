@@ -953,7 +953,7 @@
   <!-- 1. TOP NAVBAR (HIGH-CONTRAST DARK ADMIN COMMAND BAR) -->
   <nav id="navbar">
     <div class="container nav-inner">
-      <a href="/app/admin.html" class="brand-logo-wrap">
+      <a href="/admin" class="brand-logo-wrap">
         <div class="brand-icon-box">
           <i class="fa-solid fa-shield-halved"></i>
         </div>
@@ -970,12 +970,12 @@
       </ul>
 
       <div class="nav-actions-group">
-        <select class="role-select-box" id="admin-role-select" onchange="if(this.value==='citizen') window.location.href='/app';">
+        <select class="role-select-box" id="admin-role-select" onchange="if(this.value==='citizen') window.location.href='/';">
           <option value="admin" selected>Municipal Admin</option>
           <option value="citizen">Citizen Reporter</option>
         </select>
 
-        <a href="/app" class="btn-return-citizen">
+        <a href="/" class="btn-return-citizen">
           <i class="fa-solid fa-arrow-left"></i>
           <span>CITIZEN APP</span>
         </a>

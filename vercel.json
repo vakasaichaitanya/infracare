@@ -18,8 +18,16 @@
       "destination": "/index.html"
     },
     {
+      "source": "/app/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/app/index.html",
+      "destination": "/index.html"
+    },
+    {
       "source": "/app/(.*)",
-      "destination": "/$1"
+      "destination": "/"
     }
   ]
 }
