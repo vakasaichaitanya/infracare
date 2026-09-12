@@ -1,26 +1,3 @@
 {
-  "version": 2,
-  "cleanUrls": true,
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/frontend/index.html"
-    },
-    {
-      "source": "/app",
-      "destination": "/frontend/index.html"
-    },
-    {
-      "source": "/app/(.*)",
-      "destination": "/frontend/$1"
-    },
-    {
-      "source": "/frontend/(.*)",
-      "destination": "/frontend/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/frontend/index.html"
-    }
-  ]
+  "cleanUrls": true
 }
