@@ -1882,7 +1882,90 @@
     let routeLayer = null;
     let pinMarker = null;
 
-    let reportsData = [];
+    const DEFAULT_REPORTS = [
+      {
+        id: 1,
+        title: 'Severe Pothole & Caved Asphalt',
+        description: 'Large 3ft crater on Outer Circle causing hazardous traffic slowdown and bike skids.',
+        category: 'Road',
+        severity: 'Critical',
+        latitude: 28.6328,
+        longitude: 77.2195,
+        priority: 'P1',
+        priority_reason: 'Critical severity road hazard',
+        status: 'Reported',
+        support_count: 10,
+        is_duplicate: false,
+        duplicate_of_id: null,
+        image_url: null
+      },
+      {
+        id: 2,
+        title: 'Structural Crack on Pedestrian Overbridge',
+        description: 'Expansion joint separation and visible concrete spalling on stairs.',
+        category: 'Bridge',
+        severity: 'High',
+        latitude: 28.6289,
+        longitude: 77.2145,
+        priority: 'P2',
+        priority_reason: 'High safety impact on bridge structure',
+        status: 'Verified',
+        support_count: 14,
+        is_duplicate: false,
+        duplicate_of_id: null,
+        image_url: null
+      },
+      {
+        id: 3,
+        title: 'Streetlight Cluster Blackout',
+        description: 'Four consecutive light poles non-functional near Janpath crossing, zero nighttime visibility.',
+        category: 'Lighting',
+        severity: 'Medium',
+        latitude: 28.6255,
+        longitude: 77.2185,
+        priority: 'P3',
+        priority_reason: 'Lighting failure in commercial pedestrian area',
+        status: 'Assigned',
+        support_count: 3,
+        is_duplicate: false,
+        duplicate_of_id: null,
+        image_url: null
+      },
+      {
+        id: 4,
+        title: 'Broken Stormwater Drain Grate',
+        description: 'Exposed open drain chamber next to bus shelter, immediate pedestrian risk.',
+        category: 'Other',
+        severity: 'Critical',
+        latitude: 28.6360,
+        longitude: 77.2240,
+        priority: 'P1',
+        priority_reason: 'High hazard near public transit point',
+        status: 'In_Progress',
+        support_count: 19,
+        is_duplicate: false,
+        duplicate_of_id: null,
+        image_url: null
+      },
+      {
+        id: 5,
+        title: 'Faded Road Markings & Missing Signboard',
+        description: 'Speed bump warning sign damaged by tree branch.',
+        category: 'Road',
+        severity: 'Low',
+        latitude: 28.6385,
+        longitude: 77.2110,
+        priority: 'P4',
+        priority_reason: 'Low urgency maintenance item',
+        status: 'Resolved',
+        support_count: 1,
+        is_duplicate: false,
+        duplicate_of_id: null,
+        image_url: null
+      }
+    ];
+
+    let reportsData = [...DEFAULT_REPORTS];
     let currentFilter = 'ALL';
     let searchQuery = '';
     let currentStep = 1;
@@ -1898,6 +1981,10 @@
       initMap();
       setupDropzone();
       startSyncClock();
+      updateKpis();
+      renderFeed();
+      renderMarkers();
+      renderDispatchTable();
       fetchReports();
       pollNotifications();
       setInterval(fetchReports, 10000);
