@@ -1,3 +1,25 @@
 {
-  "cleanUrls": true
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/app/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/app/admin.html",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/app",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/app/(.*)",
+      "destination": "/$1"
+    }
+  ]
 }

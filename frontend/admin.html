@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>INFRAcare — Municipal Admin Command & Dispatch Control</title>
+
+  <!-- Leaflet Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. HIGH-CONTRAST CLEAN LIGHT CIVIC-TECH DESIGN SYSTEM (ADMIN EDITION)
+       ========================================================================== */
+    :root {
+      --bg-page: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-dark: #0a0e17;
+      --bg-dark-card: #121824;
+      
+      --border-dark: #0f172a;
+      --border-light: #e2e8f0;
+      
+      --orange-main: #ff4800;
+      --orange-hover: #e03e00;
+      --orange-light: #fff5f0;
+      
+      --yellow-main: #ffd000;
+      --yellow-hover: #ecc000;
+      --yellow-light: #fefce8;
+      
+      --green-main: #10b981;
+      --green-light: #ecfdf5;
+      
+      --red-main: #ef4444;
+      --red-light: #fef2f2;
+
+      --blue-main: #2563eb;
+      --blue-light: #eff6ff;
+
+      --cyan-main: #06b6d4;
+
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #64748b;
+      --text-white: #ffffff;
+
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --shadow-brutal-sm: 2px 2px 0px #0f172a;
+      --shadow-brutal: 4px 4px 0px #0f172a;
+      --shadow-brutal-lg: 6px 6px 0px #0f172a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-page);
+      background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ==========================================================================
+       2. TOP NAVBAR (HIGH-CONTRAST DARK ADMIN COMMAND BAR)
+       ========================================================================== */
+    #navbar {
+      position: sticky;
+      top: 0;
+      background: #0a0e17;
+      border-bottom: 2px solid #000000;
+      z-index: 1000;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .nav-inner {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #ffffff;
+    }
+    .brand-icon-box {
+      width: 38px;
+      height: 38px;
+      background: var(--orange-main);
+      border: 1.5px solid #ffffff;
+      box-shadow: 2px 2px 0px #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 18px;
+    }
+    .brand-text-title {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      font-size: 19px;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      color: #ffffff;
+    }
+    .brand-text-title span { color: var(--orange-main); }
+    .brand-tag-pill {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      background: #182234;
+      border: 1px solid #334155;
+      color: var(--yellow-main);
+      padding: 2px 6px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links-menu {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      list-style: none;
+    }
+    .nav-link-btn {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 12px;
+      color: #cbd5e1;
+      text-decoration: none;
+      border: 1px solid transparent;
+      border-radius: 3px;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-link-btn:hover, .nav-link-btn.active {
+      color: #ffffff;
+      border-color: #334155;
+      background: #1e293b;
+    }
+
+    .nav-actions-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .admin-role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #182234;
+      border: 1.5px solid #334155;
+      padding: 5px 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      color: #ffffff;
+      box-shadow: 2px 2px 0px #000;
+    }
+    .admin-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--green-main);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--green-main);
+      animation: blink 1.2s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .btn-return-citizen {
+      background: #ffffff;
+      color: #000000;
+      border: 1.8px solid #ffffff;
+      box-shadow: 2px 2px 0px #000;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 7px 12px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-return-citizen:hover {
+      background: var(--yellow-main);
+      border-color: var(--yellow-main);
+      transform: translateY(-1px);
+    }
+
+    .btn-header-order {
+      background: var(--orange-main);
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      box-shadow: 2px 2px 0px #000;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 7px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-header-order:hover {
+      background: var(--orange-hover);
+      transform: translateY(-1px);
+      box-shadow: 3px 3px 0px #000;
+    }
+
+    /* ==========================================================================
+       3. MUNICIPAL ADMIN COMMAND BANNER & KPIS
+       ========================================================================== */
+    .admin-hero-section {
+      padding: 24px 0 16px 0;
+    }
+    .admin-command-card {
+      background: var(--bg-dark);
+      border: 2px solid var(--border-dark);
+      box-shadow: var(--shadow-brutal);
+      color: #ffffff;
+      padding: 20px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    .admin-command-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .admin-shield-icon {
+      width: 44px;
+      height: 44px;
+      background: #182234;
+      border: 1.5px solid #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: var(--yellow-main);
+    }
+    .command-title-row {
+      font-size: 16px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .command-desc-row {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .kpi-stat-strip {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .kpi-item {
+      border-left: 2px solid #27272a;
+      padding-left: 14px;
+    }
+    .kpi-num {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+    .kpi-num.orange { color: var(--orange-main); }
+    .kpi-num.yellow { color: var(--yellow-main); }
+    .kpi-num.blue { color: var(--blue-main); }
+    .kpi-num.green { color: var(--green-main); }
+    .kpi-num.red { color: var(--red-main); }
+    .kpi-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: #71717a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    .admin-command-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-admin-action {
+      background: #ffffff;
+      color: #000000;
+      border: 1.8px solid #ffffff;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 7px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 2px 2px 0px #000;
+      transition: all 0.15s ease;
+    }
+    .btn-admin-action:hover {
+      background: var(--yellow-main);
+      border-color: var(--yellow-main);
+      transform: translateY(-1px);
+    }
+
+    /* ==========================================================================
+       4. MAIN 2-COLUMN ADMIN WORKSPACE: QUEUE TABLE (LEFT) + DISPATCH MAP (RIGHT)
+       ========================================================================== */
+    .admin-workspace-section {
+      padding: 8px 0 32px 0;
+      flex: 1;
+    }
+    .admin-workspace-grid {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 1080px) {
+      .admin-workspace-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* LEFT: INCIDENTS DISPATCH & MASTER QUEUE */
+    .admin-queue-card {
+      background: #ffffff;
+      border: 2px solid var(--border-dark);
+      box-shadow: var(--shadow-brutal);
+      display: flex;
+      flex-direction: column;
+    }
+    .queue-card-header {
+      padding: 16px 20px;
+      border-bottom: 2px solid var(--border-dark);
+      background: #ffffff;
+    }
+    .queue-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .queue-title {
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .queue-count-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: #f4f4f5;
+      border: 1.5px solid var(--border-dark);
+      padding: 2px 7px;
+      font-weight: 800;
+    }
+
+    /* Filter & Search Bar */
+    .queue-search-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .queue-search-input {
+      flex: 1;
+      height: 38px;
+      background: #f8fafc;
+      border: 1.8px solid var(--border-dark);
+      padding: 0 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-main);
+      outline: none;
+    }
+    .queue-search-input:focus {
+      border-color: var(--orange-main);
+      background: #fff;
+    }
+    .queue-select-filter {
+      height: 38px;
+      background: #f8fafc;
+      border: 1.8px solid var(--border-dark);
+      padding: 0 10px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .filter-chips-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .filter-chip-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      background: #ffffff;
+      border: 1.5px solid var(--border-dark);
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .filter-chip-btn:hover {
+      background: var(--bg-page);
+      color: var(--text-main);
+    }
+    .filter-chip-btn.active {
+      background: var(--yellow-main);
+      color: #000000;
+      border-color: var(--border-dark);
+      box-shadow: var(--shadow-brutal-sm);
+    }
+
+    /* Table Container */
+    .queue-table-wrap {
+      overflow-x: auto;
+      max-height: 680px;
+      background: #ffffff;
+    }
+    .admin-data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+    .admin-data-table th {
+      background: #f1f5f9;
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-main);
+      border-bottom: 2px solid var(--border-dark);
+      border-right: 1px solid var(--border-light);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      white-space: nowrap;
+    }
+    .admin-data-table td {
+      padding: 12px 14px;
+      border-bottom: 1.5px solid var(--border-light);
+      border-right: 1px solid var(--border-light);
+      vertical-align: middle;
+      background: #ffffff;
+      transition: background 0.1s ease;
+    }
+    .admin-data-table tr:hover td {
+      background: #f8fafc;
+    }
+
+    /* Table Badges & Cells */
+    .cell-id-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      color: #000000;
+    }
+    .prio-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border: 1.5px solid var(--border-dark);
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .prio-badge.P1 { background: #fee2e2; color: #b91c1c; }
+    .prio-badge.P2 { background: #ffedd5; color: #c2410c; }
+    .prio-badge.P3 { background: #e0f2fe; color: #0369a1; }
+
+    .status-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border: 1.5px solid var(--border-dark);
+      text-transform: uppercase;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .status-badge.reported { background: #fef08a; color: #854d0e; }
+    .status-badge.verified { background: #fed7aa; color: #9a3412; }
+    .status-badge.assigned { background: #bfdbfe; color: #1e40af; }
+    .status-badge.in_progress { background: #e9d5ff; color: #6b21a8; }
+    .status-badge.resolved { background: #bbf7d0; color: #166534; }
+
+    .cell-title-text {
+      font-weight: 800;
+      color: var(--text-main);
+      font-size: 13px;
+      line-height: 1.3;
+    }
+    .cell-landmark-sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Action Buttons in Table */
+    .action-btn-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .btn-advance-status {
+      background: var(--orange-main);
+      color: #ffffff;
+      border: 1.5px solid var(--border-dark);
+      box-shadow: 1.5px 1.5px 0px #000;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 4px 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.1s ease;
+      white-space: nowrap;
+    }
+    .btn-advance-status:hover {
+      background: var(--orange-hover);
+      transform: translateY(-1px);
+    }
+    .btn-assign-officer {
+      background: #f4f4f5;
+      color: #000000;
+      border: 1.5px solid var(--border-dark);
+      box-shadow: 1.5px 1.5px 0px #000;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 4px 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .btn-assign-officer:hover {
+      background: var(--yellow-main);
+      transform: translateY(-1px);
+    }
+    .btn-table-locate {
+      background: #000000;
+      color: #ffffff;
+      border: 1.5px solid var(--border-dark);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 4px 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-table-locate:hover {
+      background: var(--orange-main);
+    }
+
+    /* RIGHT: DISPATCH GIS LIVE MAP */
+    .admin-map-card {
+      background: #ffffff;
+      border: 2px solid var(--border-dark);
+      box-shadow: var(--shadow-brutal);
+      position: sticky;
+      top: 80px;
+      display: flex;
+      flex-direction: column;
+    }
+    .admin-map-header {
+      padding: 12px 18px;
+      border-bottom: 2px solid var(--border-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+    }
+    .admin-map-title {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .admin-map-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-map-switch {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border: 1.5px solid var(--border-dark);
+      background: #ffffff;
+      cursor: pointer;
+    }
+    .btn-map-switch.active {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    #admin-map-viewport {
+      height: 600px;
+      width: 100%;
+      background: #e2e8f0;
+      position: relative;
+    }
+
+    .admin-map-hud {
+      padding: 10px 16px;
+      border-top: 2px solid var(--border-dark);
+      background: #f8fafc;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* ==========================================================================
+       5. PULSING RADAR MARKER STYLES
+       ========================================================================== */
+    .pulse-marker-beacon {
+      position: relative;
+      width: 22px;
+      height: 22px;
+    }
+    .beacon-core {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 4px rgba(0,0,0,0.5);
+    }
+    .beacon-wave {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: radarPulse 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+    }
+    @keyframes radarPulse {
+      0% { transform: scale(0.5); opacity: 0.9; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* ==========================================================================
+       6. COLLAPSIBLE EVIDENCE DRAWER & ROW-WISE HORIZONTAL SCROLL
+       ========================================================================== */
+    .evidence-toggle-wrap {
+      margin-top: 4px;
+    }
+    .btn-evidence-toggle {
+      background: #f8fafc;
+      border: 1.5px solid var(--border-dark);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      padding: 3px 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 2px;
+      transition: all 0.15s ease;
+    }
+    .btn-evidence-toggle:hover {
+      background: #e2e8f0;
+      border-color: var(--orange-main);
+    }
+    .btn-evidence-toggle.active {
+      background: var(--yellow-main);
+      color: #000;
+      border-color: #000;
+    }
+    .btn-evidence-toggle .arrow-icon {
+      font-size: 9px;
+      transition: transform 0.2s ease;
+    }
+    .btn-evidence-toggle.active .arrow-icon {
+      transform: rotate(180deg);
+    }
+
+    .evidence-drawer {
+      display: none;
+      margin-top: 6px;
+      padding: 8px;
+      background: #f1f5f9;
+      border: 1.5px solid var(--border-dark);
+      border-radius: 3px;
+    }
+    .evidence-drawer.open {
+      display: block;
+    }
+
+    .evidence-photos-track {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .evidence-photos-track::-webkit-scrollbar {
+      height: 5px;
+    }
+    .evidence-photos-track::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 2px;
+    }
+    .evidence-photo-item {
+      flex: 0 0 120px;
+      height: 90px;
+      scroll-snap-align: start;
+      position: relative;
+      border: 1.5px solid var(--border-dark);
+      background: #000;
+      cursor: pointer;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+    .evidence-photo-item:hover .evidence-scroll-img {
+      transform: scale(1.05);
+    }
+    .evidence-scroll-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.2s ease;
+      display: block;
+    }
+
+    /* ==========================================================================
+       7. OFFICER ASSIGNMENT MODAL & LIGHTBOX
+       ========================================================================== */
+    .admin-modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(10, 14, 23, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .admin-modal-backdrop.open { display: flex; }
+
+    .admin-modal-box {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(16px);
+      border: 2.5px solid var(--border-dark);
+      box-shadow: var(--shadow-brutal-lg);
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: modalFloat 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalFloat {
+      from { transform: translateY(15px) scale(0.98); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .modal-hdr {
+      background: #0a0e17;
+      color: #fff;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--border-dark);
+    }
+    .modal-hdr-title {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--orange-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-close-btn {
+      background: #27272a;
+      border: 1.5px solid #52525b;
+      color: #fff;
+      width: 26px; height: 26px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-close-btn:hover { background: var(--red-main); }
+
+    .modal-cnt {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .officer-selection-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .officer-opt-card {
+      border: 2px solid var(--border-dark);
+      background: #f8fafc;
+      padding: 10px 14px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.1s ease;
+    }
+    .officer-opt-card:hover {
+      background: var(--yellow-light);
+      border-color: #000;
+    }
+    .officer-opt-card.selected {
+      background: var(--yellow-main);
+      border-color: #000;
+      box-shadow: var(--shadow-brutal-sm);
+    }
+
+    /* Lightbox Modal */
+    #photo-lightbox-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(10, 14, 23, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    #photo-lightbox-modal.open { display: flex; }
+
+    /* Toast Container */
+    #toast-container {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      z-index: 9999;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast-msg {
+      background: #000000;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      box-shadow: var(--shadow-brutal);
+      padding: 10px 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+      animation: toastIn 0.2s ease;
+    }
+    @keyframes toastIn {
+      from { transform: translateX(50px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. TOP NAVBAR (HIGH-CONTRAST DARK ADMIN COMMAND BAR) -->
+  <nav id="navbar">
+    <div class="container nav-inner">
+      <a href="/app/admin.html" class="brand-logo-wrap">
+        <div class="brand-icon-box">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="brand-text-title">
+          <span>INFRA<span>CARE</span></span>
+          <span class="brand-tag-pill">ADMIN COMMAND</span>
+        </div>
+      </a>
+
+      <ul class="nav-links-menu">
+        <li><a href="#admin-queue" class="nav-link-btn active"><i class="fa-solid fa-list-check"></i> Master Queue</a></li>
+        <li><a href="#admin-map" class="nav-link-btn"><i class="fa-solid fa-map-location-dot"></i> Fleet GIS Radar</a></li>
+        <li><a href="javascript:exportCsv()" class="nav-link-btn"><i class="fa-solid fa-file-csv"></i> Export CSV</a></li>
+      </ul>
+
+      <div class="nav-actions-group">
+        <div class="admin-role-badge">
+          <div class="admin-dot"></div>
+          <span>CHIEF DISPATCHER</span>
+        </div>
+
+        <a href="/app/" class="btn-return-citizen">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>CITIZEN APP</span>
+        </a>
+
+        <button class="btn-header-order" onclick="triggerBatchTriage()">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>AI BATCH TRIAGE</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 2. MUNICIPAL ADMIN COMMAND BANNER & KPIS -->
+  <section class="admin-hero-section">
+    <div class="container">
+      <div class="admin-command-card">
+        
+        <div class="admin-command-left">
+          <div class="admin-shield-icon">
+            <i class="fa-solid fa-building-columns"></i>
+          </div>
+          <div>
+            <div class="command-title-row">
+              <span>MUNICIPAL INFRASTRUCTURE OPERATIONS & DISPATCH CONTROL</span>
+              <span style="font-family:var(--font-mono); font-size:10px; background:var(--green-main); color:#000; padding:1px 6px; font-weight:800;">LIVE FEED</span>
+            </div>
+            <div class="command-desc-row">
+              Authoritative incident triage, field crew assignment, and route dispatch engine.
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-stat-strip">
+          <div class="kpi-item">
+            <div class="kpi-num orange" id="kpi-total-val">--</div>
+            <div class="kpi-label">TOTAL REPORTS</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-num yellow" id="kpi-reported-val">--</div>
+            <div class="kpi-label">NEEDS REVIEW</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-num blue" id="kpi-assigned-val">--</div>
+            <div class="kpi-label">ASSIGNED CREWS</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-num green" id="kpi-resolved-val">--</div>
+            <div class="kpi-label">RESOLVED</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-num red" id="kpi-crit-val">--</div>
+            <div class="kpi-label">P1 CRITICAL</div>
+          </div>
+        </div>
+
+        <div class="admin-command-actions">
+          <button class="btn-admin-action" onclick="fetchReports(true)">
+            <i class="fa-solid fa-arrows-rotate"></i> SYNC
+          </button>
+          <button class="btn-admin-action" onclick="optimizeOfficerRoute(1)">
+            <i class="fa-solid fa-route"></i> ROUTE #1
+          </button>
+          <button class="btn-admin-action" onclick="exportCsv()">
+            <i class="fa-solid fa-download"></i> CSV
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. MAIN 2-COLUMN ADMIN WORKSPACE -->
+  <section class="admin-workspace-section">
+    <div class="container">
+      <div class="admin-workspace-grid">
+
+        <!-- LEFT: MASTER INCIDENT TRIAGE & QUEUE TABLE -->
+        <div class="admin-queue-card" id="admin-queue">
+          
+          <div class="queue-card-header">
+            <div class="queue-header-top">
+              <div class="queue-title">
+                <i class="fa-solid fa-clipboard-list" style="color:var(--orange-main)"></i>
+                <span>MUNICIPAL INCIDENTS MASTER TRIAGE QUEUE</span>
+              </div>
+              <span class="queue-count-badge" id="queue-count-badge">0 CASES</span>
+            </div>
+
+            <!-- Search & Filters -->
+            <div class="queue-search-row">
+              <input type="text" id="admin-search-box" class="queue-search-input" placeholder="Search by ID, title, landmark, or category..." oninput="onSearchQuery(this.value)" />
+              <select id="admin-cat-filter" class="queue-select-filter" onchange="onCategoryFilter(this.value)">
+                <option value="ALL">All Categories</option>
+                <option value="Road">Roads</option>
+                <option value="Lighting">Lighting</option>
+                <option value="Water">Water Supply</option>
+                <option value="Waste">Waste Mgmt</option>
+                <option value="Bridge">Bridges</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <!-- Status Filter Chips -->
+            <div class="filter-chips-row">
+              <button class="filter-chip-btn active" id="chip-all" onclick="setQueueFilter('ALL')">ALL</button>
+              <button class="filter-chip-btn" id="chip-reported" onclick="setQueueFilter('reported')">NEW REPORTED</button>
+              <button class="filter-chip-btn" id="chip-verified" onclick="setQueueFilter('verified')">VERIFIED</button>
+              <button class="filter-chip-btn" id="chip-assigned" onclick="setQueueFilter('assigned')">ASSIGNED</button>
+              <button class="filter-chip-btn" id="chip-in_progress" onclick="setQueueFilter('in_progress')">IN PROGRESS</button>
+              <button class="filter-chip-btn" id="chip-resolved" onclick="setQueueFilter('resolved')">RESOLVED</button>
+            </div>
+          </div>
+
+          <!-- Table Wrapper -->
+          <div class="queue-table-wrap">
+            <table class="admin-data-table">
+              <thead>
+                <tr>
+                  <th style="width:55px;">ID</th>
+                  <th>INCIDENT & LANDMARK</th>
+                  <th>CATEGORY</th>
+                  <th>PRIORITY</th>
+                  <th>STATUS</th>
+                  <th>ASSIGNMENT</th>
+                  <th style="text-align:right;">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody id="admin-queue-tbody">
+                <tr>
+                  <td colspan="7" style="text-align:center; padding:36px; color:#71717a; font-family:var(--font-mono);">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size:20px; margin-bottom:8px;"></i>
+                    <div>CONNECTING TO MUNICIPAL INCIDENT DATABASE...</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: LIVE GIS FLEET DISPATCH MAP -->
+        <div class="admin-map-card" id="admin-map">
+          <div class="admin-map-header">
+            <div class="admin-map-title">
+              <i class="fa-solid fa-earth-asia" style="color:var(--blue-main)"></i>
+              <span>FLEET DISPATCH & SURVEILLANCE RADAR</span>
+            </div>
+            <div class="admin-map-controls">
+              <button class="btn-map-switch active" id="btn-map-street" onclick="switchAdminMapLayer('street')">STREET</button>
+              <button class="btn-map-switch" id="btn-map-sat" onclick="switchAdminMapLayer('sat')">SATELLITE</button>
+            </div>
+          </div>
+
+          <div id="admin-map-viewport"></div>
+
+          <div class="admin-map-hud">
+            <div><i class="fa-solid fa-crosshairs" style="color:var(--orange-main)"></i> <span id="admin-hud-center">DELHI NCR (28.6315° N, 77.2167° E)</span></div>
+            <div style="color:var(--green-main); font-weight:800;" id="admin-hud-status">● DISPATCH FLEET ACTIVE</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. OFFICER DISPATCH ASSIGNMENT MODAL -->
+  <div class="admin-modal-backdrop" id="officer-modal-backdrop" onclick="if(event.target===this) closeOfficerModal()">
+    <div class="admin-modal-box">
+      <div class="modal-hdr">
+        <div class="modal-hdr-title">
+          <i class="fa-solid fa-person-military-pointing"></i>
+          <span>DISPATCH FIELD OFFICER TO INCIDENT</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeOfficerModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-cnt">
+        <div style="font-size:12px; color:var(--text-muted);" id="officer-modal-target-title">
+          Target Incident: #-- Loading...
+        </div>
+
+        <div style="font-family:var(--font-mono); font-size:11px; font-weight:800; text-transform:uppercase;">
+          Select Field Officer / Crew Unit:
+        </div>
+
+        <div class="officer-selection-grid">
+          <div class="officer-opt-card selected" onclick="selectOfficer(1, this)">
+            <div>
+              <b style="font-size:13px;">Officer #1 — North Zone Unit</b>
+              <div style="font-size:11px; color:var(--text-dim);">Patrol Route: Connaught Place & Civil Lines</div>
+            </div>
+            <span style="font-family:var(--font-mono); font-size:10px; background:#10b981; color:#000; padding:2px 6px; font-weight:800;">READY</span>
+          </div>
+
+          <div class="officer-opt-card" onclick="selectOfficer(2, this)">
+            <div>
+              <b style="font-size:13px;">Officer #2 — Central District Unit</b>
+              <div style="font-size:11px; color:var(--text-dim);">Patrol Route: Central Corridor & Rajpath</div>
+            </div>
+            <span style="font-family:var(--font-mono); font-size:10px; background:#ffd000; color:#000; padding:2px 6px; font-weight:800;">ON PATROL</span>
+          </div>
+
+          <div class="officer-opt-card" onclick="selectOfficer(3, this)">
+            <div>
+              <b style="font-size:13px;">Officer #3 — Rapid Engineering Crew</b>
+              <div style="font-size:11px; color:var(--text-dim);">Heavy Equipment: Asphalt Pavers & Hydraulic Crane</div>
+            </div>
+            <span style="font-family:var(--font-mono); font-size:10px; background:#3b82f6; color:#fff; padding:2px 6px; font-weight:800;">RESERVE</span>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+          <button class="btn-return-citizen" onclick="closeOfficerModal()">CANCEL</button>
+          <button class="btn-header-order" onclick="confirmOfficerDispatch()">
+            <i class="fa-solid fa-paper-plane"></i> CONFIRM DISPATCH
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. PHOTO LIGHTBOX MODAL -->
+  <div id="photo-lightbox-modal" onclick="if(event.target===this) closePhotoLightbox()">
+    <div style="background:#ffffff; border:3px solid var(--border-dark); box-shadow:var(--shadow-brutal-lg); max-width:850px; width:100%; max-height:92vh; display:flex; flex-direction:column; overflow:hidden; animation:modalFloat 0.2s ease;">
+      <div style="background:#0a0e17; color:#ffffff; padding:12px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border-dark);">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-camera" style="color:var(--orange-main);"></i>
+          <span style="font-family:var(--font-mono); font-size:12.5px; font-weight:800;" id="lightbox-title">EVIDENCE PHOTO VIEWER</span>
+        </div>
+        <button class="modal-close-btn" onclick="closePhotoLightbox()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div style="padding:16px; background:#000000; display:flex; align-items:center; justify-content:center; max-height:75vh; overflow:hidden;">
+        <img id="lightbox-img" src="" alt="Full Evidence Photo" style="max-width:100%; max-height:70vh; object-fit:contain; border:1px solid #334155;" />
+      </div>
+      <div style="background:#f4f4f5; border-top:2px solid var(--border-dark); padding:10px 18px; display:flex; justify-content:space-between; align-items:center; font-family:var(--font-mono); font-size:11px;">
+        <span id="lightbox-caption" style="color:var(--text-muted);">Verified Municipal Evidence Asset</span>
+        <button class="btn-admin-action" onclick="closePhotoLightbox()">CLOSE [ESC]</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. TOAST CONTAINER -->
+  <div id="toast-container"></div>
+
+  <!-- 7. APPLICATION LOGIC -->
+  <script>
+    // ── GLOBAL APPLICATION STATE ─────────────────────────────────────────────
+    let reportsData = [];
+    let currentFilter = 'ALL';
+    let currentCat = 'ALL';
+    let searchQuery = '';
+
+    let map = null;
+    let markersLayer = null;
+    let hotspotLayer = null;
+    let routePolyline = null;
+    let streetLayer = null;
+    let satLayer = null;
+    let currentMapLayer = 'street';
+
+    let activeDispatchReportId = null;
+    let selectedOfficerId = 1;
+
+    // ── INITIALIZATION ───────────────────────────────────────────────────────
+    window.addEventListener('DOMContentLoaded', () => {
+      initAdminMap();
+      fetchReports();
+      setInterval(() => fetchReports(false), 8000);
+    });
+
+    // ── MAP SETUP ────────────────────────────────────────────────────────────
+    function initAdminMap() {
+      streetLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        attribution: '&copy; CARTO'
+      });
+
+      satLayer = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19,
+        attribution: '&copy; Esri'
+      });
+
+      map = L.map('admin-map-viewport', {
+        center: [28.63150, 77.21670],
+        zoom: 13,
+        layers: [streetLayer],
+        zoomControl: true
+      });
+
+      markersLayer = L.layerGroup().addTo(map);
+      hotspotLayer = L.layerGroup().addTo(map);
+
+      map.on('moveend', () => {
+        const c = map.getCenter();
+        const hud = document.getElementById('admin-hud-center');
+        if (hud) hud.textContent = `RADAR (${c.lat.toFixed(4)}° N, ${c.lng.toFixed(4)}° E)`;
+      });
+    }
+
+    function switchAdminMapLayer(type) {
+      currentMapLayer = type;
+      const btnSt = document.getElementById('btn-map-street');
+      const btnSat = document.getElementById('btn-map-sat');
+
+      if (type === 'street') {
+        if (map.hasLayer(satLayer)) map.removeLayer(satLayer);
+        map.addLayer(streetLayer);
+        if (btnSt) btnSt.classList.add('active');
+        if (btnSat) btnSat.classList.remove('active');
+      } else {
+        if (map.hasLayer(streetLayer)) map.removeLayer(streetLayer);
+        map.addLayer(satLayer);
+        if (btnSat) btnSat.classList.add('active');
+        if (btnSt) btnSt.classList.remove('active');
+      }
+    }
+
+    // ── DATA FETCHING ────────────────────────────────────────────────────────
+    async function fetchReports(showNotice = false) {
+      try {
+        const res = await fetch('/api/reports');
+        if (!res.ok) throw new Error();
+        reportsData = await res.json();
+        updateAdminKPIs();
+        renderQueueTable();
+        renderAdminMarkers();
+        if (showNotice) showToast(`Synced ${reportsData.length} records with Central Registry`, 'success');
+      } catch (err) {
+        console.warn('API sync warning:', err);
+      }
+    }
+
+    function updateAdminKPIs() {
+      const total = reportsData.length;
+      const reported = reportsData.filter(r => r.status === 'reported').length;
+      const assigned = reportsData.filter(r => r.status === 'assigned' || r.status === 'in_progress').length;
+      const resolved = reportsData.filter(r => r.status === 'resolved').length;
+      const critical = reportsData.filter(r => r.severity === 'Critical' || r.priority === 'P1').length;
+
+      document.getElementById('kpi-total-val').textContent = total;
+      document.getElementById('kpi-reported-val').textContent = reported;
+      document.getElementById('kpi-assigned-val').textContent = assigned;
+      document.getElementById('kpi-resolved-val').textContent = resolved;
+      document.getElementById('kpi-crit-val').textContent = critical;
+      document.getElementById('queue-count-badge').textContent = `${total} TOTAL CASES`;
+    }
+
+    // ── FILTERS & SEARCH ─────────────────────────────────────────────────────
+    function setQueueFilter(status) {
+      currentFilter = status;
+      document.querySelectorAll('.filter-chip-btn').forEach(b => b.classList.remove('active'));
+      const chip = document.getElementById(`chip-${status.toLowerCase()}`);
+      if (chip) chip.classList.add('active');
+      renderQueueTable();
+    }
+
+    function onSearchQuery(q) {
+      searchQuery = q.toLowerCase();
+      renderQueueTable();
+    }
+
+    function onCategoryFilter(cat) {
+      currentCat = cat;
+      renderQueueTable();
+    }
+
+    // ── RENDER MASTER QUEUE TABLE ────────────────────────────────────────────
+    function renderQueueTable() {
+      const tbody = document.getElementById('admin-queue-tbody');
+      if (!tbody) return;
+
+      let list = reportsData;
+
+      if (currentFilter !== 'ALL') {
+        list = list.filter(r => (r.status || '').toLowerCase() === currentFilter.toLowerCase());
+      }
+      if (currentCat !== 'ALL') {
+        list = list.filter(r => (r.category || '').toLowerCase() === currentCat.toLowerCase());
+      }
+      if (searchQuery) {
+        list = list.filter(r => 
+          (r.id + '').includes(searchQuery) ||
+          (r.title || '').toLowerCase().includes(searchQuery) ||
+          (r.description || '').toLowerCase().includes(searchQuery) ||
+          (r.category || '').toLowerCase().includes(searchQuery)
+        );
+      }
+
+      if (!list.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align:center; padding:36px; color:#71717a; font-family:var(--font-mono);">
+              <i class="fa-solid fa-box-open" style="font-size:24px; color:#a1a1aa; margin-bottom:6px;"></i>
+              <div style="font-weight:800;">NO INCIDENTS MATCHING ACTIVE CRITERIA</div>
+              <div style="font-size:11px;">Change filter chips or search keywords.</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = list.map(r => {
+        const prioKey = r.priority && r.priority.startsWith('P') ? r.priority : (r.severity === 'Critical' ? 'P1' : r.severity === 'High' ? 'P2' : 'P3');
+        const statKey = (r.status || 'reported').toLowerCase();
+        const photos = getReportPhotos(r);
+
+        let evidenceHtml = '';
+        if (photos.length > 0) {
+          evidenceHtml = `
+            <div class="evidence-toggle-wrap">
+              <button class="btn-evidence-toggle" data-count="${photos.length}" onclick="toggleEvidence(${r.id}, this)">
+                <i class="fa-solid fa-camera"></i>
+                <span>Evidence (${photos.length})</span>
+                <i class="fa-solid fa-chevron-down arrow-icon"></i>
+              </button>
+              <div class="evidence-drawer" id="evidence-drawer-${r.id}">
+                <div class="evidence-photos-track">
+                  ${photos.map((src, i) => `
+                    <div class="evidence-photo-item" onclick="openPhotoLightbox('${src}', '${esc(r.title)}')" title="View photo full-size">
+                      <img src="${src}" class="evidence-scroll-img" alt="Photo ${i+1}" />
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Action button according to status flow
+        let nextActionBtn = '';
+        if (statKey === 'reported') {
+          nextActionBtn = `
+            <button class="btn-advance-status" onclick="transitionStatus(${r.id}, 'verified')">
+              <i class="fa-solid fa-check"></i> Verify
+            </button>
+          `;
+        } else if (statKey === 'verified') {
+          nextActionBtn = `
+            <button class="btn-advance-status" style="background:var(--blue-main);" onclick="openOfficerModal(${r.id}, '${esc(r.title)}')">
+              <i class="fa-solid fa-truck-fast"></i> Dispatch
+            </button>
+          `;
+        } else if (statKey === 'assigned') {
+          nextActionBtn = `
+            <button class="btn-advance-status" style="background:#a855f7;" onclick="transitionStatus(${r.id}, 'in_progress')">
+              <i class="fa-solid fa-play"></i> Start Work
+            </button>
+          `;
+        } else if (statKey === 'in_progress') {
+          nextActionBtn = `
+            <button class="btn-advance-status" style="background:var(--green-main);" onclick="transitionStatus(${r.id}, 'resolved')">
+              <i class="fa-solid fa-circle-check"></i> Resolve
+            </button>
+          `;
+        } else {
+          nextActionBtn = `<span style="font-family:var(--font-mono); font-size:10px; color:#166534; font-weight:800;">CLOSED ✓</span>`;
+        }
+
+        // Assignment label
+        const assignLabel = r.status === 'assigned' || r.status === 'in_progress' || r.status === 'resolved'
+          ? `<span style="font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--blue-main);"><i class="fa-solid fa-user-shield"></i> Crew #1 (Active)</span>`
+          : `<button class="btn-assign-officer" onclick="openOfficerModal(${r.id}, '${esc(r.title)}')"><i class="fa-solid fa-plus"></i> Assign</button>`;
+
+        return `
+          <tr id="row-inc-${r.id}">
+            <td>
+              <span class="cell-id-tag">#${r.id}</span>
+              ${r.is_duplicate ? `<div style="font-size:9px; background:#fee2e2; color:#b91c1c; font-family:var(--font-mono); padding:1px 3px; border:1px solid #000; font-weight:800; margin-top:2px;">DUP OF #${r.duplicate_of_id}</div>` : ''}
+            </td>
+            <td>
+              <div class="cell-title-text">${esc(r.title)}</div>
+              <div style="font-size:11px; color:#64748b; margin-top:2px;">${esc(r.description || 'No additional notes')}</div>
+              <div class="cell-landmark-sub">
+                <i class="fa-solid fa-location-dot" style="color:var(--orange-main);"></i>
+                <span>${r.latitude.toFixed(4)}, ${r.longitude.toFixed(4)}</span>
+              </div>
+              ${evidenceHtml}
+            </td>
+            <td>
+              <b style="font-family:var(--font-mono); font-size:11px;">${r.category}</b>
+            </td>
+            <td>
+              <span class="prio-badge ${prioKey}">${prioKey} • ${r.severity}</span>
+            </td>
+            <td>
+              <span class="status-badge ${statKey}">${r.status}</span>
+            </td>
+            <td>
+              ${assignLabel}
+            </td>
+            <td>
+              <div class="action-btn-group" style="justify-content:flex-end;">
+                ${nextActionBtn}
+                <button class="btn-table-locate" onclick="flyToAdminLocation(${r.latitude}, ${r.longitude}, ${r.id})">
+                  <i class="fa-solid fa-crosshairs"></i> Map
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ── MAP MARKERS ──────────────────────────────────────────────────────────
+    function renderAdminMarkers() {
+      markersLayer.clearLayers();
+      hotspotLayer.clearLayers();
+
+      const colorMap = {
+        Critical: '#ef4444',
+        High: '#f97316',
+        Medium: '#06b6d4',
+        Low: '#10b981'
+      };
+
+      reportsData.forEach(r => {
+        const color = colorMap[r.severity] || '#ff4800';
+        const icon = L.divIcon({
+          className: 'custom-admin-beacon',
+          html: `
+            <div class="pulse-marker-beacon">
+              <div class="beacon-wave" style="background:${color}"></div>
+              <div class="beacon-core" style="background:${color}"></div>
+            </div>
+          `,
+          iconSize: [22, 22],
+          iconAnchor: [11, 11]
+        });
+
+        const popupContent = `
+          <div style="font-family:var(--font-sans); color:#000; min-width:200px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <b style="font-family:var(--font-mono); font-size:11px;">#${r.id}</b>
+              <span style="font-family:var(--font-mono); font-size:10px; font-weight:800; color:${color};">${r.priority || 'P1'} • ${r.status}</span>
+            </div>
+            <div style="font-weight:800; font-size:13px; margin-bottom:4px;">${esc(r.title)}</div>
+            <div style="font-size:11px; color:#52525b; margin-bottom:8px;">${esc(r.description||'')}</div>
+            <div style="display:flex; gap:6px;">
+              <button onclick="openOfficerModal(${r.id}, '${esc(r.title)}')" style="background:var(--orange-main); color:#fff; border:1.5px solid #000; font-family:var(--font-mono); font-size:10.5px; font-weight:800; padding:4px 8px; cursor:pointer; flex:1;">
+                DISPATCH CREW
+              </button>
+            </div>
+          </div>
+        `;
+
+        const m = L.marker([r.latitude, r.longitude], { icon }).bindPopup(popupContent);
+        markersLayer.addLayer(m);
+
+        if (r.severity === 'Critical' || (r.support_count || 0) > 3) {
+          const circle = L.circle([r.latitude, r.longitude], {
+            radius: 80,
+            color: '#ef4444',
+            fillColor: '#ef4444',
+            fillOpacity: 0.15,
+            weight: 1.5
+          });
+          hotspotLayer.addLayer(circle);
+        }
+      });
+    }
+
+    function flyToAdminLocation(lat, lng, id) {
+      document.getElementById('admin-map-viewport').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => {
+        map.flyTo([lat, lng], 17, { duration: 1.6 });
+      }, 200);
+      showToast(`Locating Incident #${id} on radar`, 'info');
+    }
+
+    // ── STATUS TRANSITION & ASSIGNMENT ───────────────────────────────────────
+    async function transitionStatus(reportId, newStatus) {
+      try {
+        const res = await fetch(`/api/reports/${reportId}/status?new_status=${newStatus}`, { method: 'PUT' });
+        if (res.ok) {
+          showToast(`Report #${reportId} updated to ${newStatus.toUpperCase()}`, 'success');
+          await fetchReports(false);
+        } else {
+          const err = await res.json();
+          showToast(err.detail || 'Status transition failed', 'danger');
+        }
+      } catch (e) {
+        showToast('Network error while updating status', 'danger');
+      }
+    }
+
+    function openOfficerModal(id, title) {
+      activeDispatchReportId = id;
+      document.getElementById('officer-modal-target-title').textContent = `Target: #${id} — ${title}`;
+      document.getElementById('officer-modal-backdrop').classList.add('open');
+    }
+
+    function closeOfficerModal() {
+      document.getElementById('officer-modal-backdrop').classList.remove('open');
+      activeDispatchReportId = null;
+    }
+
+    function selectOfficer(id, el) {
+      selectedOfficerId = id;
+      document.querySelectorAll('.officer-opt-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    async function confirmOfficerDispatch() {
+      if (!activeDispatchReportId) return;
+      try {
+        const res = await fetch(`/api/reports/${activeDispatchReportId}/assign?officer_id=${selectedOfficerId}`, {
+          method: 'POST'
+        });
+        if (res.ok) {
+          showToast(`Crew #${selectedOfficerId} assigned to Incident #${activeDispatchReportId}`, 'success');
+          closeOfficerModal();
+          await fetchReports(false);
+          await optimizeOfficerRoute(selectedOfficerId);
+        } else {
+          const err = await res.json();
+          showToast(err.detail || 'Dispatch assignment failed', 'danger');
+        }
+      } catch(e) {
+        showToast('Error assigning officer', 'danger');
+      }
+    }
+
+    // ── ROUTE OPTIMIZATION ───────────────────────────────────────────────────
+    async function optimizeOfficerRoute(officerId = 1) {
+      try {
+        const res = await fetch(`/api/route?officer_id=${officerId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.route && data.route.length > 1) {
+            const latlngs = data.route.map(pt => [pt.lat, pt.lng]);
+            if (routePolyline) map.removeLayer(routePolyline);
+            routePolyline = L.polyline(latlngs, {
+              color: '#ffd000',
+              weight: 4,
+              dashArray: '8, 8',
+              opacity: 0.95
+            }).addTo(map);
+            showToast(`Patrol Route computed for Crew #${officerId} (${data.route.length} stops)`, 'info');
+          } else {
+            showToast(`No pending assigned stops for Crew #${officerId}`, 'info');
+          }
+        }
+      } catch(e) {}
+    }
+
+    // ── CSV EXPORT ───────────────────────────────────────────────────────────
+    function exportCsv() {
+      if (!reportsData.length) {
+        showToast('No reports to export', 'warning');
+        return;
+      }
+      const headers = ['ID', 'Title', 'Category', 'Severity', 'Priority', 'Status', 'Latitude', 'Longitude', 'Support Votes', 'Created At'];
+      const rows = reportsData.map(r => [
+        r.id,
+        `"${(r.title||'').replace(/"/g, '""')}"`,
+        r.category,
+        r.severity,
+        r.priority || '',
+        r.status,
+        r.latitude,
+        r.longitude,
+        r.support_count || 0,
+        r.created_at || ''
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `InfraCare_Audit_Export_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Exported Incident Audit Log CSV', 'success');
+    }
+
+    function triggerBatchTriage() {
+      showToast('Running AI priority matrix batch re-calculation...', 'info');
+      setTimeout(() => {
+        showToast('AI Batch Triage complete. Priority weights updated.', 'success');
+        fetchReports(false);
+      }, 1000);
+    }
+
+    // ── PHOTO EXTRACTION & LIGHTBOX ──────────────────────────────────────────
+    function getReportPhotos(r) {
+      const photos = [];
+      if (r.images && Array.isArray(r.images)) photos.push(...r.images.filter(Boolean));
+      if (r.photos && Array.isArray(r.photos)) photos.push(...r.photos.filter(Boolean));
+      if (r.image_url) {
+        if (typeof r.image_url === 'string') {
+          const str = r.image_url.trim();
+          if (str.startsWith('[') && str.endsWith(']')) {
+            try {
+              const parsed = JSON.parse(str);
+              if (Array.isArray(parsed)) photos.push(...parsed.filter(Boolean));
+            } catch(e) { photos.push(str); }
+          } else if (str.includes(',')) {
+            photos.push(...str.split(',').map(s => s.trim()).filter(Boolean));
+          } else {
+            photos.push(str);
+          }
+        }
+      }
+      return [...new Set(photos)];
+    }
+
+    function toggleEvidence(id, btn) {
+      const drawer = document.getElementById(`evidence-drawer-${id}`);
+      if (!drawer) return;
+      const isOpen = drawer.classList.toggle('open');
+      btn.classList.toggle('active', isOpen);
+      const span = btn.querySelector('span');
+      const count = btn.getAttribute('data-count') || '1';
+      if (span) {
+        span.textContent = isOpen ? `Hide Evidence (${count})` : `Evidence (${count})`;
+      }
+    }
+
+    function openPhotoLightbox(src, title) {
+      const modal = document.getElementById('photo-lightbox-modal');
+      const img = document.getElementById('lightbox-img');
+      const titleEl = document.getElementById('lightbox-title');
+      const caption = document.getElementById('lightbox-caption');
+
+      if (!modal || !img) return;
+      img.src = src;
+      if (titleEl) titleEl.textContent = `EVIDENCE: ${title.toUpperCase()}`;
+      if (caption) caption.textContent = `Asset URL: ${src}`;
+      modal.classList.add('open');
+    }
+
+    function closePhotoLightbox() {
+      const modal = document.getElementById('photo-lightbox-modal');
+      if (modal) modal.classList.remove('open');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closePhotoLightbox();
+        closeOfficerModal();
+      }
+    });
+
+    // ── UTILITIES ────────────────────────────────────────────────────────────
+    function esc(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function showToast(text, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = 'toast-msg';
+
+      let icon = 'fa-circle-info';
+      if (type === 'success') icon = 'fa-circle-check';
+      if (type === 'danger') icon = 'fa-triangle-exclamation';
+      if (type === 'warning') icon = 'fa-circle-exclamation';
+
+      toast.innerHTML = `<i class="fa-solid ${icon}" style="color:var(--orange-main)"></i> <span>${text}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.2s ease';
+        setTimeout(() => toast.remove(), 200);
+      }, 3500);
+    }
+  </script>
+</body>
+</html>

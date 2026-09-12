@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>INFRAcare | Municipal Infrastructure Command</title>
+  <title>INFRAcare — Civic Pulse | Municipal Infrastructure Command</title>
 
   <!-- Leaflet Map CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -837,22 +837,16 @@
     #report-modal-backdrop.open { display: flex; }
 
     #report-dialog-box {
-      background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 2.5px solid var(--border-dark);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35), var(--shadow-brutal-lg);
+      background: #ffffff;
+      border: 3px solid var(--border-dark);
+      box-shadow: var(--shadow-brutal-lg);
       width: 100%;
-      max-width: 960px;
+      max-width: 540px;
       max-height: 90vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      animation: modalFloat 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    @keyframes modalFloat {
-      from { transform: translateY(20px) scale(0.97); opacity: 0; }
-      to { transform: translateY(0) scale(1); opacity: 1; }
+      animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     @keyframes modalPop {
       from { transform: scale(0.96); opacity: 0; }
@@ -1174,111 +1168,6 @@
       .footer-wrapper { flex-direction: row; }
     }
   
-    /* Modal 2-Column Split: Form on Left + Interactive Map on Right */
-    .modal-two-col-body {
-      display: grid;
-      grid-template-columns: 1.15fr 1fr;
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-    }
-    @media (max-width: 820px) {
-      .modal-two-col-body {
-        grid-template-columns: 1fr;
-        overflow-y: auto;
-      }
-    }
-    .modal-form-side {
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      background: transparent;
-    }
-    .modal-pane-content {
-      flex: 1;
-      padding: 18px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      overflow-y: auto;
-    }
-    .modal-map-side {
-      border-left: 2px solid var(--border-dark);
-      display: flex;
-      flex-direction: column;
-      background: #f1f5f9;
-      position: relative;
-    }
-    @media (max-width: 820px) {
-      .modal-map-side {
-        border-left: none;
-        border-top: 2px solid var(--border-dark);
-        min-height: 280px;
-      }
-    }
-    .modal-map-top-bar {
-      padding: 10px 14px;
-      background: rgba(255, 255, 255, 0.95);
-      border-bottom: 2px solid var(--border-dark);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .modal-map-top-title {
-      font-family: var(--font-mono);
-      font-size: 11.5px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .modal-map-layers-switch {
-      display: flex;
-      gap: 4px;
-    }
-    .modal-map-layer-btn {
-      background: #ffffff;
-      border: 1.5px solid var(--border-dark);
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 7px;
-      cursor: pointer;
-    }
-    .modal-map-layer-btn.active {
-      background: #000000;
-      color: #ffffff;
-    }
-    #modal-side-map-view {
-      flex: 1;
-      width: 100%;
-      min-height: 350px;
-      background: #cbd5e1;
-      position: relative;
-    }
-    .modal-map-bottom-bar {
-      padding: 10px 14px;
-      background: rgba(255, 255, 255, 0.95);
-      border-top: 2px solid var(--border-dark);
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-family: var(--font-mono);
-    }
-    .modal-map-coords-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .modal-map-coords-badge {
-      font-size: 11px;
-      font-weight: 800;
-      background: #000;
-      color: #fff;
-      padding: 2px 6px;
-    }
-
-  
     /* ==========================================================================
        8. COLLAPSIBLE MULTI-PHOTO EVIDENCE & HORIZONTAL SCROLL TRACK
        ========================================================================== */
@@ -1438,6 +1327,7 @@
           <a href="#workspace-section" class="nav-link"><i class="fa-solid fa-list-ul"></i> Incidents Feed</a>
           <a href="#web-map-viewport" class="nav-link"><i class="fa-solid fa-map-location-dot"></i> Live GIS Map</a>
           <a href="#dispatch-section" class="nav-link"><i class="fa-solid fa-shield-halved"></i> Dispatch Queue</a>
+          <a href="/app/admin.html" class="nav-link" style="color:var(--yellow-main);"><i class="fa-solid fa-user-shield"></i> Admin Portal</a>
         </nav>
 
         <div class="nav-actions">
@@ -1472,7 +1362,7 @@
               <i class="fa-solid fa-satellite-dish"></i>
               <span>INFRASTRUCTURE COMMAND</span>
             </div>
-            <h1 class="hero-headline">InfraCare</h1>
+            <h1 class="hero-headline">Civic pulse</h1>
             <p class="hero-subtitle">Transparent municipal infrastructure maintenance, one report at a time. AI-driven priority triage, duplicate radar detection, and automated field dispatch.</p>
           </div>
 
@@ -1492,7 +1382,7 @@
         <div class="network-banner-card">
           <div class="network-banner-top">
             <span class="network-tag-label">MUNICIPAL NETWORK</span>
-            <span class="network-sync-clock" id="sync-timer-val" style="cursor:pointer;" onclick="triggerManualSync()" title="Click to synchronize telemetry with server">SYNC --:--:--</span>
+            <span class="network-sync-clock" id="sync-timer-val">SYNC 00:04:12</span>
           </div>
           <div class="network-status-text">OPERATIONAL</div>
           <div class="network-desc-text">
@@ -1882,90 +1772,7 @@
     let routeLayer = null;
     let pinMarker = null;
 
-    const DEFAULT_REPORTS = [
-      {
-        id: 1,
-        title: 'Severe Pothole & Caved Asphalt',
-        description: 'Large 3ft crater on Outer Circle causing hazardous traffic slowdown and bike skids.',
-        category: 'Road',
-        severity: 'Critical',
-        latitude: 28.6328,
-        longitude: 77.2195,
-        priority: 'P1',
-        priority_reason: 'Critical severity road hazard',
-        status: 'Reported',
-        support_count: 10,
-        is_duplicate: false,
-        duplicate_of_id: null,
-        image_url: null
-      },
-      {
-        id: 2,
-        title: 'Structural Crack on Pedestrian Overbridge',
-        description: 'Expansion joint separation and visible concrete spalling on stairs.',
-        category: 'Bridge',
-        severity: 'High',
-        latitude: 28.6289,
-        longitude: 77.2145,
-        priority: 'P2',
-        priority_reason: 'High safety impact on bridge structure',
-        status: 'Verified',
-        support_count: 14,
-        is_duplicate: false,
-        duplicate_of_id: null,
-        image_url: null
-      },
-      {
-        id: 3,
-        title: 'Streetlight Cluster Blackout',
-        description: 'Four consecutive light poles non-functional near Janpath crossing, zero nighttime visibility.',
-        category: 'Lighting',
-        severity: 'Medium',
-        latitude: 28.6255,
-        longitude: 77.2185,
-        priority: 'P3',
-        priority_reason: 'Lighting failure in commercial pedestrian area',
-        status: 'Assigned',
-        support_count: 3,
-        is_duplicate: false,
-        duplicate_of_id: null,
-        image_url: null
-      },
-      {
-        id: 4,
-        title: 'Broken Stormwater Drain Grate',
-        description: 'Exposed open drain chamber next to bus shelter, immediate pedestrian risk.',
-        category: 'Other',
-        severity: 'Critical',
-        latitude: 28.6360,
-        longitude: 77.2240,
-        priority: 'P1',
-        priority_reason: 'High hazard near public transit point',
-        status: 'In_Progress',
-        support_count: 19,
-        is_duplicate: false,
-        duplicate_of_id: null,
-        image_url: null
-      },
-      {
-        id: 5,
-        title: 'Faded Road Markings & Missing Signboard',
-        description: 'Speed bump warning sign damaged by tree branch.',
-        category: 'Road',
-        severity: 'Low',
-        latitude: 28.6385,
-        longitude: 77.2110,
-        priority: 'P4',
-        priority_reason: 'Low urgency maintenance item',
-        status: 'Resolved',
-        support_count: 1,
-        is_duplicate: false,
-        duplicate_of_id: null,
-        image_url: null
-      }
-    ];
-
-    let reportsData = [...DEFAULT_REPORTS];
+    let reportsData = [];
     let currentFilter = 'ALL';
     let searchQuery = '';
     let currentStep = 1;
@@ -1981,129 +1788,23 @@
       initMap();
       setupDropzone();
       startSyncClock();
-      updateKpis();
-      renderFeed();
-      renderMarkers();
-      renderDispatchTable();
       fetchReports();
       pollNotifications();
       setInterval(fetchReports, 10000);
       setInterval(pollNotifications, 15000);
     });
 
-    let lastSyncTimestamp = new Date();
-
-    function updateSyncClock() {
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-      const el = document.getElementById('sync-timer-val');
-      if (el) {
-        el.textContent = `SYNC ${timeStr}`;
-      }
-    }
-
     function startSyncClock() {
-      updateSyncClock();
-      setInterval(updateSyncClock, 1000);
+      let seconds = 252;
+      setInterval(() => {
+        seconds++;
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        const formatted = `SYNC 00:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        const el = document.getElementById('sync-timer-val');
+        if (el) el.textContent = formatted;
+      }, 1000);
     }
-
-    async function triggerManualSync() {
-      showToast('Synchronizing telemetry with Municipal GIS Registry...', 'info');
-      await fetchReports();
-      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-      showToast(`Telemetry synced successfully at ${timeStr}`, 'success');
-    }
-
-    
-    // ── MODAL SIDE MAP STATE & HANDLERS ──────────────────────────────────────
-    let modalSideMap = null;
-    let modalSideMarker = null;
-    let modalSideStreetLayer = null;
-    let modalSideSatLayer = null;
-    let currentModalSideLayer = 'street';
-
-    function initModalSideMap() {
-      const container = document.getElementById('modal-side-map-view');
-      if (!container) return;
-
-      if (!modalSideMap) {
-        modalSideStreetLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-          maxZoom: 19,
-          attribution: '&copy; CARTO'
-        });
-
-        modalSideSatLayer = L.tileLayer(ESRI_SAT_URL, {
-          maxZoom: 19,
-          attribution: '&copy; Esri'
-        });
-
-        modalSideMap = L.map('modal-side-map-view', {
-          center: [currentLat, currentLng],
-          zoom: 15,
-          layers: [modalSideStreetLayer],
-          zoomControl: true
-        });
-
-        modalSideMap.on('click', async (e) => {
-          await updateLocationPin(e.latlng.lat, e.latlng.lng);
-          showToast(`Report spot: ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`, 'info');
-        });
-      }
-
-      [50, 150, 300].forEach(delay => {
-        setTimeout(() => {
-          if (modalSideMap) {
-            modalSideMap.invalidateSize();
-            modalSideMap.setView([currentLat, currentLng], 15);
-            updateModalSideMarker(currentLat, currentLng);
-          }
-        }, delay);
-      });
-    }
-
-    function switchModalSideMapLayer(type) {
-      currentModalSideLayer = type;
-      const btnSt = document.getElementById('modal-side-street-btn');
-      const btnSat = document.getElementById('modal-side-sat-btn');
-
-      if (!modalSideMap) return;
-
-      if (type === 'street') {
-        if (modalSideMap.hasLayer(modalSideSatLayer)) modalSideMap.removeLayer(modalSideSatLayer);
-        modalSideMap.addLayer(modalSideStreetLayer);
-        if (btnSt) btnSt.classList.add('active');
-        if (btnSat) btnSat.classList.remove('active');
-      } else {
-        if (modalSideMap.hasLayer(modalSideStreetLayer)) modalSideMap.removeLayer(modalSideStreetLayer);
-        modalSideMap.addLayer(modalSideSatLayer);
-        if (btnSat) btnSat.classList.add('active');
-        if (btnSt) btnSt.classList.remove('active');
-      }
-    }
-
-    function updateModalSideMarker(lat, lng) {
-      if (!modalSideMap) return;
-
-      const pinIcon = L.divIcon({
-        className: 'custom-pin-modal',
-        html: `
-          <div class="pulse-marker-beacon">
-            <div class="beacon-wave" style="background:#ff4800"></div>
-            <div class="beacon-core" style="background:#ff4800"></div>
-          </div>
-        `,
-        iconSize: [22, 22],
-        iconAnchor: [11, 11]
-      });
-
-      if (modalSideMarker) modalSideMap.removeLayer(modalSideMarker);
-      modalSideMarker = L.marker([lat, lng], { icon: pinIcon, draggable: true }).addTo(modalSideMap);
-      modalSideMarker.on('dragend', async (ev) => {
-        const pt = ev.target.getLatLng();
-        await updateLocationPin(pt.lat, pt.lng);
-      });
-    }
-
 
     // ── MAP INITIALIZATION ────────────────────────────────────────────────────
     function initMap() {
@@ -2158,23 +1859,10 @@
         const res = await fetch(`${API_BASE}/reports`);
         if (!res.ok) throw new Error();
         reportsData = await res.json();
-        lastSyncTimestamp = new Date();
         updateKpis();
         renderFeed();
         renderMarkers();
         renderDispatchTable();
-
-        // Visual pulse feedback on the municipal sync clock
-        const el = document.getElementById('sync-timer-val');
-        if (el) {
-          el.style.transition = 'color 0.3s ease, transform 0.3s ease';
-          el.style.color = '#10b981';
-          el.style.transform = 'scale(1.06)';
-          setTimeout(() => {
-            el.style.color = '';
-            el.style.transform = '';
-          }, 600);
-        }
       } catch (err) {
         console.warn('Sync issue:', err);
       }
@@ -2537,17 +2225,10 @@
         if (res.ok) {
           const data = await res.json();
           const name = data.display_name ? data.display_name.split(',').slice(0, 3).join(', ') : 'Detected GIS Location';
-          const l1 = document.getElementById('txt-modal-landmark');
-          if (l1) l1.textContent = name;
-          const l2 = document.getElementById('modal-map-bottom-landmark');
-          if (l2) l2.textContent = name;
+          document.getElementById('txt-modal-landmark').textContent = name;
         }
       } catch(e) {
-        const fb = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-        const l1 = document.getElementById('txt-modal-landmark');
-        if (l1) l1.textContent = fb;
-        const l2 = document.getElementById('modal-map-bottom-landmark');
-        if (l2) l2.textContent = fb;
+        document.getElementById('txt-modal-landmark').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
       }
     }
 

@@ -30,6 +30,13 @@ app.include_router(reports.router, prefix="/api")
 def root():
     return RedirectResponse(url="/app")
 
+# Admin → /app/admin.html
+@app.get("/admin")
+def admin_redirect():
+    return RedirectResponse(url="/app/admin.html")
+
+
+
 # Serve uploaded images at /uploads
 _upload_dir = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "uploaded_images")
