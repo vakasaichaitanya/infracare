@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Unified Infracare Data Store & Sync -->
+  <script src="/store.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>INFRAcare — Civic Pulse | Municipal Infrastructure Command</title>
@@ -1788,6 +1790,7 @@
       setupDropzone();
       startSyncClock();
       fetchReports();
+    if (window.InfracareStore) InfracareStore.onSync(() => fetchReports(false));
       pollNotifications();
       setInterval(fetchReports, 10000);
       setInterval(pollNotifications, 15000);
@@ -1853,18 +1856,29 @@
     }
 
     // ── DATA FETCHING & RENDERING ───────────────────────────────────────────
-    async function fetchReports() {
+    async function fetchReports(showNotice = false) {
       try {
         const res = await fetch(`${API_BASE}/reports`);
-        if (!res.ok) throw new Error();
-        reportsData = await res.json();
-        updateKpis();
-        renderFeed();
-        renderMarkers();
-        renderDispatchTable();
+        if (res.ok) {
+          reportsData = await res.json();
+          if (window.InfracareStore) {
+            // Keep store updated with backend if online
+            reportsData.forEach(r => InfracareStore.upsert(r));
+          }
+        } else {
+          throw new Error('API not available');
+        }
       } catch (err) {
-        console.warn('Sync issue:', err);
+        // Resilient fallback to InfracareStore (Vercel / static / offline)
+        if (window.InfracareStore) {
+          reportsData = InfracareStore.getReports();
+        }
       }
+      updateKpis();
+      renderFeed();
+      renderMarkers();
+      renderDispatchTable();
+      if (showNotice) showToast(`Synced ${reportsData.length} records with Municipal Registry`, 'info');
     }
 
     function updateKpis() {
@@ -2395,25 +2409,52 @@
       fd.append('longitude', currentLng);
       if (selectedPhoto) fd.append('image', selectedPhoto);
 
+      let savedReport = null;
       try {
         const res = await fetch(`${API_BASE}/reports`, { method: 'POST', body: fd });
-        const data = await res.json();
+        if (res.ok) {
+          savedReport = await res.json();
+        }
+      } catch (e) {
+        console.warn('Backend offline or static hosting on Vercel, saving to InfracareStore');
+      }
 
+      // Always save or mirror in InfracareStore so Citizen and Admin portals sync instantly
+      if (window.InfracareStore) {
+        if (!savedReport) {
+          const priority = selectedSeverity === 'Critical' ? 'P1' : (selectedSeverity === 'High' ? 'P2' : 'P3');
+          savedReport = InfracareStore.addReport({
+            title: document.getElementById('inp-modal-title').value.trim() || 'Civic Infrastructure Alert',
+            description: document.getElementById('inp-modal-desc').value.trim() || 'Reported via Citizen Mobile Telemetry Terminal',
+            category: selectedCategory,
+            severity: selectedSeverity,
+            priority: priority,
+            latitude: currentLat,
+            longitude: currentLng,
+            status: 'reported',
+            address: currentLat.toFixed(4) + ', ' + currentLng.toFixed(4) + ' (Connaught Place, New Delhi)'
+          });
+        } else {
+          InfracareStore.upsert(savedReport);
+        }
+      }
+
+      if (savedReport) {
         sub.textContent = '4/4: Calculating city-wide AI priority index...';
         await delay(350);
 
         spinner.style.display = 'none';
         check.style.display = 'block';
-        title.textContent = `INCIDENT LOGGED: IC-#${data.id}`;
-        sub.textContent = `Triage Priority: ${data.priority || 'P1'} • Dispatch Status: Reported`;
+        title.textContent = `INCIDENT LOGGED: IC-#${savedReport.id}`;
+        sub.textContent = `Triage Priority: ${savedReport.priority || 'P1'} • Dispatch Status: Reported`;
         doneBtn.style.display = 'inline-flex';
 
         // Reset
         document.getElementById('inp-modal-title').value = '';
         document.getElementById('inp-modal-desc').value = '';
         removeModalPhoto();
-        fetchReports();
-      } catch (err) {
+        await fetchReports();
+      } else {
         overlay.classList.remove('show');
         showToast('Error connecting to backend database', 'danger');
       }
@@ -2426,13 +2467,21 @@
     }
 
     async function supportIncident(id) {
+      let backed = false;
       try {
         const res = await fetch(`${API_BASE}/reports/${id}/support?user_id=2`, { method: 'POST' });
-        if (res.ok) {
-          showToast(`Community support recorded for Report #${id}!`, 'success');
-          fetchReports();
-        }
+        if (res.ok) backed = true;
       } catch (e) {}
+
+      if (window.InfracareStore) {
+        InfracareStore.addSupport(id);
+        backed = true;
+      }
+
+      if (backed) {
+        showToast(`Community support recorded for Incident #${id}!`, 'success');
+        fetchReports();
+      }
     }
 
     // ── DISPATCH TABLE & ADMIN OPERATIONS ────────────────────────────────────
@@ -2469,23 +2518,39 @@
     }
 
     async function updateReportStatus(id, newStatus) {
+      let updated = false;
       try {
         const res = await fetch(`${API_BASE}/reports/${id}/status?new_status=${newStatus}`, { method: 'PUT' });
-        if (res.ok) {
-          showToast(`Report #${id} moved to ${newStatus}`, 'success');
-          fetchReports();
-        }
+        if (res.ok) updated = true;
       } catch (e) {}
+
+      if (window.InfracareStore) {
+        InfracareStore.updateStatus(id, newStatus);
+        updated = true;
+      }
+
+      if (updated) {
+        showToast(`Report #${id} moved to ${newStatus}`, 'success');
+        fetchReports();
+      }
     }
 
     async function assignOfficer(reportId, officerId) {
+      let assigned = false;
       try {
         const res = await fetch(`${API_BASE}/reports/${reportId}/assign?officer_id=${officerId}`, { method: 'POST' });
-        if (res.ok) {
-          showToast(`Report #${reportId} assigned to Field Officer #${officerId}!`, 'success');
-          fetchReports();
-        }
+        if (res.ok) assigned = true;
       } catch (e) {}
+
+      if (window.InfracareStore) {
+        InfracareStore.assignOfficer(reportId, officerId);
+        assigned = true;
+      }
+
+      if (assigned) {
+        showToast(`Report #${reportId} assigned to Field Officer #${officerId}!`, 'success');
+        fetchReports();
+      }
     }
 
     async function generateInspectionRoute() {

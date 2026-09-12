@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Unified Infracare Data Store & Sync -->
+  <script src="/store.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>INFRAcare — Municipal Admin Command & Dispatch Control</title>
@@ -1244,6 +1246,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       initAdminMap();
       fetchReports();
+    if (window.InfracareStore) InfracareStore.onSync(() => fetchReports(false));
       setInterval(() => fetchReports(false), 8000);
     });
 
@@ -1298,15 +1301,23 @@
     async function fetchReports(showNotice = false) {
       try {
         const res = await fetch('/api/reports');
-        if (!res.ok) throw new Error();
-        reportsData = await res.json();
-        updateAdminKPIs();
-        renderQueueTable();
-        renderAdminMarkers();
-        if (showNotice) showToast(`Synced ${reportsData.length} records with Central Registry`, 'success');
+        if (res.ok) {
+          reportsData = await res.json();
+          if (window.InfracareStore) {
+            reportsData.forEach(r => InfracareStore.upsert(r));
+          }
+        } else {
+          throw new Error('API not available');
+        }
       } catch (err) {
-        console.warn('API sync warning:', err);
+        if (window.InfracareStore) {
+          reportsData = InfracareStore.getReports();
+        }
       }
+      updateAdminKPIs();
+      renderQueueTable();
+      renderAdminMarkers();
+      if (showNotice) showToast(`Synced ${reportsData.length} records with Municipal Registry`, 'success');
     }
 
     function updateAdminKPIs() {
@@ -1548,17 +1559,22 @@
 
     // ── STATUS TRANSITION & ASSIGNMENT ───────────────────────────────────────
     async function transitionStatus(reportId, newStatus) {
+      let updated = false;
       try {
         const res = await fetch(`/api/reports/${reportId}/status?new_status=${newStatus}`, { method: 'PUT' });
-        if (res.ok) {
-          showToast(`Report #${reportId} updated to ${newStatus.toUpperCase()}`, 'success');
-          await fetchReports(false);
-        } else {
-          const err = await res.json();
-          showToast(err.detail || 'Status transition failed', 'danger');
-        }
-      } catch (e) {
-        showToast('Network error while updating status', 'danger');
+        if (res.ok) updated = true;
+      } catch (e) {}
+
+      if (window.InfracareStore) {
+        InfracareStore.updateStatus(reportId, newStatus);
+        updated = true;
+      }
+
+      if (updated) {
+        showToast(`Report #${reportId} updated to ${newStatus.toUpperCase()}`, 'success');
+        await fetchReports(false);
+      } else {
+        showToast('Status transition failed', 'danger');
       }
     }
 
@@ -1581,20 +1597,25 @@
 
     async function confirmOfficerDispatch() {
       if (!activeDispatchReportId) return;
+      let assigned = false;
       try {
         const res = await fetch(`/api/reports/${activeDispatchReportId}/assign?officer_id=${selectedOfficerId}`, {
           method: 'POST'
         });
-        if (res.ok) {
-          showToast(`Crew #${selectedOfficerId} assigned to Incident #${activeDispatchReportId}`, 'success');
-          closeOfficerModal();
-          await fetchReports(false);
-          await optimizeOfficerRoute(selectedOfficerId);
-        } else {
-          const err = await res.json();
-          showToast(err.detail || 'Dispatch assignment failed', 'danger');
-        }
-      } catch(e) {
+        if (res.ok) assigned = true;
+      } catch(e) {}
+
+      if (window.InfracareStore) {
+        InfracareStore.assignOfficer(activeDispatchReportId, selectedOfficerId);
+        assigned = true;
+      }
+
+      if (assigned) {
+        showToast(`Crew #${selectedOfficerId} assigned to Incident #${activeDispatchReportId}`, 'success');
+        closeOfficerModal();
+        await fetchReports(false);
+        try { await optimizeOfficerRoute(selectedOfficerId); } catch(e) {}
+      } else {
         showToast('Error assigning officer', 'danger');
       }
     }
