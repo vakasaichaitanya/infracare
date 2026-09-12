@@ -1337,8 +1337,7 @@
           </div>
 
           <select class="role-select-box" id="global-role-select" onchange="onRoleSwitched(this.value)">
-            <option value="citizen">Citizen Reporter</option>
-            <option value="officer">Field Officer (#3)</option>
+            <option value="citizen" selected>Citizen Reporter</option>
             <option value="admin">Municipal Admin</option>
           </select>
 
@@ -2514,8 +2513,15 @@
     }
 
     function onRoleSwitched(role) {
-      currentRole = role;
-      showToast(`Switched active profile to ${role.toUpperCase()}`, 'info');
+      if (role === 'admin') {
+        showToast('Switching to Municipal Admin portal...', 'info');
+        setTimeout(() => {
+          window.location.href = '/admin';
+        }, 150);
+      } else {
+        currentRole = role;
+        showToast('Active profile: Citizen Reporter', 'info');
+      }
     }
 
     async function pollNotifications() {

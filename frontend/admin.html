@@ -197,9 +197,21 @@
       box-shadow: 0 0 8px var(--green-main);
       animation: blink 1.2s infinite;
     }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+    .role-select-box {
+      background: #182234;
+      border: 1.8px solid #334155;
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 5px 8px;
+      cursor: pointer;
+      outline: none;
+      box-shadow: 2px 2px 0px #000;
+    }
+    .role-select-box option {
+      background: #0a0e17;
+      color: #ffffff;
     }
 
     .btn-return-citizen {
@@ -956,12 +968,12 @@
       </ul>
 
       <div class="nav-actions-group">
-        <div class="admin-role-badge">
-          <div class="admin-dot"></div>
-          <span>CHIEF DISPATCHER</span>
-        </div>
+        <select class="role-select-box" id="admin-role-select" onchange="if(this.value==='citizen') window.location.href='/app';">
+          <option value="admin" selected>Municipal Admin</option>
+          <option value="citizen">Citizen Reporter</option>
+        </select>
 
-        <a href="/app/" class="btn-return-citizen">
+        <a href="/app" class="btn-return-citizen">
           <i class="fa-solid fa-arrow-left"></i>
           <span>CITIZEN APP</span>
         </a>
