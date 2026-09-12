@@ -1,0 +1,32 @@
+# .gitignore
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+# Flutter
+.dart_tool/
+.buildlog
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.idea/
+# IDEs
+.vscode/
+*.iml
+*.sublime-project
+*.sublime-workspace
+# OS files
+.DS_Store
+Thumbs.db
+# Docker
+*.log
+
+# Databases & local state
+*.db
+.env
+backend/app/uploaded_images/*
+!backend/app/uploaded_images/.gitkeep
